@@ -295,9 +295,13 @@ information.
 We open it in excel, remove the header lines and the below lines
 describing the probes and colors
 
-We then use awk to extract our fields of interest 1. The name of the SNP
-is in field 3, 2. The chromosome position is in column 10 3. And map
-position in column 11
+We then use `awk` to extract our fields of interest;
+
+1.  The name of the SNP is in field 3,
+2.  The chromosome position is in column 10
+3.  And map position in column 11
+
+<!-- -->
 
     awk -F ","  '{ print $2, $10 }' Goat_IGGC_65K_v2_150696172021_chrom_info.txt > jan_2021_chrom_info.txt
 
@@ -674,7 +678,7 @@ print(mds_plot)
 ![](SNP-Chip_Data_Analysis_with_Plink_and_R_files/figure-gfm/mds_plot-1.png)<!-- -->
 
 ``` r
-# ===== initial plot shows we might have a few clusters, up tp 6, with one sample being a clear outlier.
+# ===== initial plot shows we might have a few clusters, up to 6, with one sample being a clear outlier.
 
 # ===== we add phenotype data to the plot to add more aesthetics to the plot, i.e color, and sample names.
 ```
