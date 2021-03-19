@@ -1,0 +1,48 @@
+---
+title: "SNP-Chip Data Analysis with Plink and R"
+author: "Bernice Waweru"
+date: "`r format(Sys.time(), '%a %d, %b %Y')`"
+output:
+  github_document:
+    toc: true
+    fig_width: 12
+    fig_height: 8
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Objective and info on data 
+
+To analyse goat diversity with data generated through goat genome SNP Chip from illumina through labogena. The goatiggc_cons_60k SNPChip includes 53,347 SNPS typed on the samples 
+Data on the hpc found here (/home/bngina/Fellows/goat_diversity/orig_data/oct_2019)
+Original file has 648 samples, as calculated from the ped file (less -S orig_data/oct_2019/Caprin_60k.ped | wc -l)
+
+
+## load required tools 
+
+module load plink/1.9
+
+
+# ===== define path variables =======================================
+
+# ===== file prefix of the map and ped file 
+
+file='/home/bngina/Fellows/goat_diversity/orig_data/oct_2019/Caprin_60k'
+
+#===== dir to store the output files generated during analysis ======
+
+out='/home/bngina/Fellows/goat_diversity/plink_out_march_2021'
+
+
+### Session Info
+
+Details of packages used with the work flow
+
+```{r}
+devtools::session_info()
+```
+
