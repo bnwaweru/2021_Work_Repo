@@ -27,6 +27,8 @@ Fri 09, Apr 2021
         -   [Anlaysis of data with
             *Adegenet*](#anlaysis-of-data-with-adegenet)
             -   [Using `find.clusters`](#using-find.clusters)
+            -   [Describing clusters using
+                **DAPC**](#describing-clusters-using-dapc)
     -   [Session Info](#session-info)
 
 # Objective and information on data
@@ -710,8 +712,11 @@ setwd("C:/Users/BWaweru/OneDrive - CGIAR/Documents/Fellows/Goat_diversity_projec
 ```
 
 Internally most `adegenet` functions will call the tool parallel to try
-and maximise the number of core available for its use to run the jobs in
+and maximize the number of core available for its use to run the jobs in
 parallel i.e multi-thread.
+
+    Error in mclapply(levels(fac.block), function(lev) x[, which(fac.block ==  : 
+      'mc.cores' > 1 is not supported on Windows
 
 Add the arguments `parallel=FALSE` to avoid getting the above error.
 Found this solution
@@ -721,20 +726,20 @@ Found this solution
 read.PLINK("data-raw/plink.raw", map.file = "data-raw/bin_patrick_2021_prnd_NB.map", parallel = FALSE) -> pat_dat
 ```
 
-    FALSE 
-    FALSE  Reading PLINK raw format into a genlight object... 
-    FALSE 
-    FALSE 
-    FALSE  Reading loci information... 
-    FALSE 
-    FALSE  Reading and converting genotypes... 
-    FALSE .
-    FALSE  Building final object... 
-    FALSE 
-    FALSE ...done.
+    ## 
+    ##  Reading PLINK raw format into a genlight object... 
+    ## 
+    ## 
+    ##  Reading loci information... 
+    ## 
+    ##  Reading and converting genotypes... 
+    ## .
+    ##  Building final object... 
+    ## 
+    ## ...done.
 
 ``` r
-# ===== save data for easly loading next time
+# ===== save data for easy loading next time
 
 save(pat_dat, file = "results/pat_data.RData") # much lighter, only 2.8Mb, original data is 23.1 Mb + 1.8 Mb
 ```
@@ -746,22 +751,22 @@ Check that the loaded data is okay
 pat_dat
 ```
 
-    FALSE  /// GENLIGHT OBJECT /////////
-    FALSE 
-    FALSE  // 259 genotypes,  44,099 binary SNPs, size: 7.3 Mb
-    FALSE  43188 (0.38 %) missing data
-    FALSE 
-    FALSE  // Basic content
-    FALSE    @gen: list of 259 SNPbin
-    FALSE    @ploidy: ploidy of each individual  (range: 2-2)
-    FALSE 
-    FALSE  // Optional content
-    FALSE    @ind.names:  259 individual labels
-    FALSE    @loc.names:  44099 locus labels
-    FALSE    @chromosome: factor storing chromosomes of the SNPs
-    FALSE    @position: integer storing positions of the SNPs
-    FALSE    @pop: population of each individual (group size range: 1-1)
-    FALSE    @other: a list containing: sex  phenotype  pat  mat
+    ##  /// GENLIGHT OBJECT /////////
+    ## 
+    ##  // 259 genotypes,  44,099 binary SNPs, size: 7.3 Mb
+    ##  43188 (0.38 %) missing data
+    ## 
+    ##  // Basic content
+    ##    @gen: list of 259 SNPbin
+    ##    @ploidy: ploidy of each individual  (range: 2-2)
+    ## 
+    ##  // Optional content
+    ##    @ind.names:  259 individual labels
+    ##    @loc.names:  44099 locus labels
+    ##    @chromosome: factor storing chromosomes of the SNPs
+    ##    @position: integer storing positions of the SNPs
+    ##    @pop: population of each individual (group size range: 1-1)
+    ##    @other: a list containing: sex  phenotype  pat  mat
 
 ``` r
 # ==== individual names
@@ -769,11 +774,11 @@ pat_dat
 indNames(pat_dat)[1:10]
 ```
 
-    FALSE  [1] "WG6694108-DNA_A01_110kin"  "WG6694108-DNA_A02_105kin1"
-    FALSE  [3] "WG6694108-DNA_A03_55kin"   "WG6694108-DNA_A04_50kin"  
-    FALSE  [5] "WG6694108-DNA_A05_104kin"  "WG6694108-DNA_A06_82kin"  
-    FALSE  [7] "WG6694108-DNA_A07_75kin1"  "WG6694108-DNA_A08_110kin1"
-    FALSE  [9] "WG6694108-DNA_A09_77kin"   "WG6694108-DNA_A10_Zkin2"
+    ##  [1] "WG6694108-DNA_A01_110kin"  "WG6694108-DNA_A02_105kin1"
+    ##  [3] "WG6694108-DNA_A03_55kin"   "WG6694108-DNA_A04_50kin"  
+    ##  [5] "WG6694108-DNA_A05_104kin"  "WG6694108-DNA_A06_82kin"  
+    ##  [7] "WG6694108-DNA_A07_75kin1"  "WG6694108-DNA_A08_110kin1"
+    ##  [9] "WG6694108-DNA_A09_77kin"   "WG6694108-DNA_A10_Zkin2"
 
 ``` r
 # ===== loci names
@@ -781,11 +786,11 @@ indNames(pat_dat)[1:10]
 locNames(pat_dat)[1:10]
 ```
 
-    FALSE  [1] "snp14099-scaffold1560-920888_G"  "snp14100-scaffold1560-986550_G" 
-    FALSE  [3] "snp14101-scaffold1560-1032913_A" "snp2819-scaffold1082-727669_A"  
-    FALSE  [5] "snp2817-scaffold1082-658683_A"   "snp2816-scaffold1082-615033_G"  
-    FALSE  [7] "snp2815-scaffold1082-557554_A"   "snp2812-scaffold1082-438570_A"  
-    FALSE  [9] "snp2810-scaffold1082-348665_G"   "snp2809-scaffold1082-312463_A"
+    ##  [1] "snp14099-scaffold1560-920888_G"  "snp14100-scaffold1560-986550_G" 
+    ##  [3] "snp14101-scaffold1560-1032913_A" "snp2819-scaffold1082-727669_A"  
+    ##  [5] "snp2817-scaffold1082-658683_A"   "snp2816-scaffold1082-615033_G"  
+    ##  [7] "snp2815-scaffold1082-557554_A"   "snp2812-scaffold1082-438570_A"  
+    ##  [9] "snp2810-scaffold1082-348665_G"   "snp2809-scaffold1082-312463_A"
 
 #### Using `find.clusters`
 
@@ -824,6 +829,5401 @@ seems to be a clear elbow,
 ![value of BIC
 values](./embedded-images/value_of_BIC_versus_number_of_clusters_5_selected.PNG)
 
+Additionally, the output store in `grp` is a list
+
+``` r
+load("results/grp.RData")
+names(grp)
+```
+
+    ## [1] "Kstat" "stat"  "grp"   "size"
+
+Assigned groups are stored under `grp$grp`, as per the 5 clusters we
+chose to keep
+
+``` r
+grp$grp[1:10]
+```
+
+    ##  WG6694108-DNA_A01_110kin WG6694108-DNA_A02_105kin1   WG6694108-DNA_A03_55kin 
+    ##                         3                         4                         3 
+    ##   WG6694108-DNA_A04_50kin  WG6694108-DNA_A05_104kin   WG6694108-DNA_A06_82kin 
+    ##                         3                         3                         3 
+    ##  WG6694108-DNA_A07_75kin1 WG6694108-DNA_A08_110kin1   WG6694108-DNA_A09_77kin 
+    ##                         3                         3                         3 
+    ##   WG6694108-DNA_A10_Zkin2 
+    ##                         1 
+    ## Levels: 1 2 3 4 5
+
+#### Describing clusters using **DAPC**
+
+[`DAPC`](https://bmcgenomdata.biomedcentral.com/articles/10.1186/1471-2156-11-94)
+was pioneered by Jombart and colleagues (Jombart et al., 2010) and can
+be used to infer the number of clusters of genetically related
+individuals. In this multivariate statistical approach variance in the
+sample is partitioned into a between-group and within- group component,
+in an effort to maximize discrimination between groups. In DAPC, data is
+first transformed using a principal components analysis (PCA) and
+subsequently clusters are identified using discriminant analysis (DA).
+
+In *adegenet*, it is implemented with the function `dapc`. We run it on
+our data using the inferred groups stores un `grp$grp`
+
+``` r
+# ==== load the grp object
+dapc1_pat <- dapc(pat_dat, grp$grp)
+```
+
+The method displays the same graph of cumulated variance as in
+`find.cluster`. However, unlike k-means, DAPC can benefit from not using
+too many PCs. The bottom-line is therefore retaining a few PCs without
+sacrificing too much information. We see very little information gained
+by adding PC’s after around 30, hence we retain 30.
+
+![dapc\_variance\_grapgh](embedded-images/dapc_variance_graph.PNG)
+
+The method also displays a barplot of eigen-values for the discriminant
+analysis asking for number of discriminant function to keep, we keep all
+4.
+
+![eigen-values plot](embedded-images/dapc_eigenvalue_barplot.PNG)
+
+The object dapc1\_pat contains a lot of information:
+
+![dapc1\_pat\_infor](embedded-images/dapc1_pat_infor.PNG)
+
+``` r
+dapc1_pat
+
+# ===== we also save the object so we can call into memomry whenever we need to use it
+
+save(dapc1_pat, file = "./results/dapc1_pat.RData")
+```
+
+Essentially, the slots `ind.coord` and `grp.coord` contain the
+coordinates of then individuals and of the groups used in scatter plots.
+Basic scatter plots can be obtained using the function `scatterplot`:
+
+``` r
+load("./results/dapc1_pat.RData")
+
+scatter(dapc1_pat)
+```
+
+![](SNP-Chip_Data_Analysis_with_Plink_and_R_files/figure-gfm/unnamed-chunk-5-1.png)<!-- -->
+
+``` r
+# ===== a bit customization for a more readable plot
+require(RColorBrewer)
+myCol <-  brewer.pal(5, "Set1") # choose some colors
+
+scatter(dapc1_pat, scree.da=TRUE,scree.pca = TRUE, bg="white", pch=20, cell=0, cstar=0, col=myCol, solid=.4, cex=3,clab=0, leg=TRUE, txt.leg=paste("Cluster",1:5))
+```
+
+![](SNP-Chip_Data_Analysis_with_Plink_and_R_files/figure-gfm/unnamed-chunk-5-2.png)<!-- -->
+
+It appears that we have 3 main clusters and two clusters that could
+probably be outliers.
+
+We can explore this a bit further with caution. In the manual it states
+*caution should be taken when interpreting group memberships of a DAPC
+based on too many PCs, as there are risks of over-fitting the
+discriminant functions*
+
+We kept 30 PCs and 4 discriminant functions.
+
+Let’s look at a summary of the dapc object
+
+``` r
+summary(dapc1_pat)
+```
+
+    ## $n.dim
+    ## [1] 4
+    ## 
+    ## $n.pop
+    ## [1] 5
+    ## 
+    ## $assign.prop
+    ## [1] 0.996139
+    ## 
+    ## $assign.per.pop
+    ##         1         2         3         4         5 
+    ## 1.0000000 1.0000000 1.0000000 0.9714286 1.0000000 
+    ## 
+    ## $prior.grp.size
+    ## 
+    ##   1   2   3   4   5 
+    ##   6 117  96  35   5 
+    ## 
+    ## $post.grp.size
+    ## 
+    ##   1   2   3   4   5 
+    ##   6 117  97  34   5
+
+Average assignment proportion, `assign.prop`, is quite high, 0.996.
+Looking closely at the assignment values;
+
+``` r
+round(dapc1_pat$posterior,3) -> assgn_values
+
+kableExtra::kable(assgn_values, caption = "Proportions of successful assgnemnt of individuals")
+```
+
+<table>
+<caption>
+Proportions of successful assgnemnt of individuals
+</caption>
+<thead>
+<tr>
+<th style="text-align:left;">
+</th>
+<th style="text-align:right;">
+1
+</th>
+<th style="text-align:right;">
+2
+</th>
+<th style="text-align:right;">
+3
+</th>
+<th style="text-align:right;">
+4
+</th>
+<th style="text-align:right;">
+5
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+WG6694108-DNA\_A01\_110kin
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1.000
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694108-DNA\_A02\_105kin1
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+1.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694108-DNA\_A03\_55kin
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1.000
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694108-DNA\_A04\_50kin
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1.000
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694108-DNA\_A05\_104kin
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1.000
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694108-DNA\_A06\_82kin
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1.000
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694108-DNA\_A07\_75kin1
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1.000
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694108-DNA\_A08\_110kin1
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1.000
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694108-DNA\_A09\_77kin
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1.000
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694108-DNA\_A10\_Zkin2
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694108-DNA\_A11\_51kin2
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1.000
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694108-DNA\_A12\_83kin1
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+1.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694108-DNA\_B01\_21kinX1
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1.000
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694108-DNA\_B02\_21kin1
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1.000
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694108-DNA\_B03\_78kin1
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1.000
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694108-DNA\_B04\_101kin1
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1.000
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694108-DNA\_B05\_75kinX1
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1.000
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694108-DNA\_B06\_30kin2
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1.000
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694108-DNA\_B07\_80kin2
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0.975
+</td>
+<td style="text-align:right;">
+0.025
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694108-DNA\_B08\_31kin2
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1.000
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694108-DNA\_B09\_12kin2
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1.000
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694108-DNA\_B11\_16kin2
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1.000
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694108-DNA\_B12\_4kin1
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1.000
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694108-DNA\_C01\_XYkin1
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1.000
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694108-DNA\_C02\_36kin2
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1.000
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694108-DNA\_C03\_29kin2
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1.000
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694108-DNA\_C04\_52kin1
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1.000
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694108-DNA\_C05\_58kin
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1.000
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694108-DNA\_C06\_9kin2
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1.000
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694108-DNA\_C08\_61kin1
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1.000
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694108-DNA\_C10\_33kin1
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+1.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694108-DNA\_C12\_63kin1
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1.000
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694108-DNA\_D01\_104kin2
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1.000
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694108-DNA\_D02\_19kin2
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1.000
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694108-DNA\_D03\_13kin25-1
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1.000
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694108-DNA\_D04\_41kin1
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1.000
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694108-DNA\_D05\_30kinX1
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1.000
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694108-DNA\_D06\_16kin1
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1.000
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694108-DNA\_D07\_ZkinX1
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694108-DNA\_D08\_50kinZ
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1.000
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694108-DNA\_D09\_75kin
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1.000
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694108-DNA\_D12\_50kin1
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1.000
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694108-DNA\_E01\_81kin
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1.000
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694108-DNA\_E02\_28kin\_dil
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1.000
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694108-DNA\_E03\_110kin2
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1.000
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694108-DNA\_E04\_31Xkin1
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1.000
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694108-DNA\_E06\_25kin1
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1.000
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694108-DNA\_E07\_Z-Xkin1
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694108-DNA\_E10\_31kinX1
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1.000
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694108-DNA\_E11\_72kin2
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1.000
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694108-DNA\_E12\_37kin1
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1.000
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694108-DNA\_F01\_25kin1x
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1.000
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694108-DNA\_F02\_13kin26-1
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1.000
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694108-DNA\_F03\_72kin1
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1.000
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694108-DNA\_F04\_82kin1
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1.000
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694108-DNA\_F05\_102kin
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0.049
+</td>
+<td style="text-align:right;">
+0.951
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694108-DNA\_F06\_1kin
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694108-DNA\_F07\_46kin1
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1.000
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694108-DNA\_F08\_96kin1
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1.000
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694108-DNA\_F09\_21kinP
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1.000
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694108-DNA\_F10\_81kin1
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1.000
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694108-DNA\_F11\_99kin1
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1.000
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694108-DNA\_F12\_30kin1Z
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1.000
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694108-DNA\_G01\_57kin
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1.000
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694108-DNA\_G02\_51kin1
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1.000
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694108-DNA\_G03\_53kin1
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1.000
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694108-DNA\_G04\_43kin1a
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1.000
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694108-DNA\_G05\_100kin1A
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1.000
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694108-DNA\_G06\_18kin
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1.000
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694108-DNA\_G07\_39kin
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1.000
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694108-DNA\_G08\_98kin
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1.000
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694108-DNA\_G09\_106kin
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1.000
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694108-DNA\_G11\_100kin
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1.000
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694108-DNA\_G12\_59kin
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1.000
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694108-DNA\_H01\_49kinB
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1.000
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694108-DNA\_H02\_30kinZ
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1.000
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694108-DNA\_H03\_30kin
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1.000
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694108-DNA\_H04\_71kin
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1.000
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694108-DNA\_H05\_67kin
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1.000
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694108-DNA\_H07\_70kin
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1.000
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694108-DNA\_H08\_62kin
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1.000
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694108-DNA\_H09\_1kinZ
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694108-DNA\_H10\_15kinZ
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1.000
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694108-DNA\_H11\_3kin
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694108-DNA\_H12\_47kin
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1.000
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694109-DNA\_A02\_53kin2
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1.000
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694109-DNA\_A03\_103kin
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1.000
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694109-DNA\_A04\_48kin1
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1.000
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694109-DNA\_A05\_29kin1
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1.000
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694109-DNA\_A06\_87kin1
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1.000
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694109-DNA\_A07\_10kin
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1.000
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694109-DNA\_A09\_38kin
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1.000
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694109-DNA\_A10\_9kin
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1.000
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694109-DNA\_A11\_Pkin
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1.000
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694109-DNA\_B02\_61kin2
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1.000
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694109-DNA\_B03\_Zkin1
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694109-DNA\_B04\_kinW
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+1.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694109-DNA\_B05\_kinZ1
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1.000
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694109-DNA\_B06\_23kin1
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1.000
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694109-DNA\_B07\_40marq
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694109-DNA\_B09\_60styl
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694109-DNA\_B10\_58styl
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694109-DNA\_C01\_2mlm
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694109-DNA\_C02\_4marq
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694109-DNA\_C03\_57stylx
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694109-DNA\_C04\_10styl
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+1.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694109-DNA\_C05\_42marqz
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694109-DNA\_C06\_H2
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694109-DNA\_C07\_14BHG
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694109-DNA\_C09\_59styl2
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694109-DNA\_C10\_56styl1
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694109-DNA\_C11\_C21
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694109-DNA\_C12\_E11
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694109-DNA\_D01\_K22A
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694109-DNA\_D02\_E21
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694109-DNA\_D03\_K3
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694109-DNA\_D05\_23Bar1
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694109-DNA\_D07\_22Bar2
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694109-DNA\_D08\_L22
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694109-DNA\_D09\_29marq1
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694109-DNA\_D10\_6mlm2
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694109-DNA\_D11\_4marq1
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694109-DNA\_D12\_2mlm1
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694109-DNA\_E01\_66styl1
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694109-DNA\_E03\_14Bul2
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694109-DNA\_E04\_49marq2
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694109-DNA\_E05\_15lweba1
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694109-DNA\_E06\_20marq2
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694109-DNA\_E07\_42marq
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694109-DNA\_E08\_E3
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694109-DNA\_E09\_63styl2
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694109-DNA\_E10\_17marq1
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694109-DNA\_E12\_16marqB2
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694109-DNA\_F01\_15BHG1
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694109-DNA\_F02\_62styl1
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694109-DNA\_F03\_48marq1
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694109-DNA\_F04\_50marq1
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694109-DNA\_F05\_M2
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694109-DNA\_F06\_J1
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694109-DNA\_F07\_21marq
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694109-DNA\_F08\_31marq2
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694109-DNA\_F09\_30marq2
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694109-DNA\_F10\_4marq2
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694109-DNA\_F11\_26marq2
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694109-DNA\_F12\_24marq1
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694109-DNA\_G02\_F3
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694109-DNA\_G03\_39marq1
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694109-DNA\_G04\_45marq
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694109-DNA\_G05\_20marq1
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694109-DNA\_G06\_23marq
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694109-DNA\_G07\_N21
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694109-DNA\_G08\_I31
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694109-DNA\_G09\_G11
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694109-DNA\_G10\_29marq
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694109-DNA\_G11\_31marq1
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694109-DNA\_H01\_38marq1
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694109-DNA\_H02\_7mlm1
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694109-DNA\_H03\_8mlm1
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694109-DNA\_H04\_B11
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694109-DNA\_H05\_B2
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694109-DNA\_H06\_J12
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694109-DNA\_H07\_1marq2
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694109-DNA\_H08\_M11
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694109-DNA\_H09\_8marq1
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694109-DNA\_H10\_A21
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694109-DNA\_H11\_I2
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694109-DNA\_H12\_47marq1
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694110-DNA\_A01\_55styl
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694110-DNA\_A03\_46marq1
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694110-DNA\_A04\_M31
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694110-DNA\_A05\_26Bar1
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694110-DNA\_A06\_40marq1
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694110-DNA\_A07\_12marq
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694110-DNA\_A08\_F2
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694110-DNA\_A09\_8stylz
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+1.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694110-DNA\_A10\_D1Z
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+1
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694110-DNA\_A11\_65stylz
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694110-DNA\_A12\_18lweba2
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694110-DNA\_B01\_29Bar2
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694110-DNA\_B02\_B3
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694110-DNA\_B03\_18marq
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694110-DNA\_B04\_J31
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694110-DNA\_B05\_A31
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694110-DNA\_B06\_K2
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694110-DNA\_B08\_4mlm
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694110-DNA\_B10\_67stylz1
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694110-DNA\_C01\_F3A1
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694110-DNA\_C02\_A12
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694110-DNA\_C04\_I1
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694110-DNA\_C05\_1marq1
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694110-DNA\_C06\_8mlm
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694110-DNA\_C07\_D11
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+1
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694110-DNA\_C08\_8styl
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+1.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694110-DNA\_C09\_37marq1
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694110-DNA\_C10\_30marq
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694110-DNA\_C11\_3mlm1
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694110-DNA\_C12\_19marq2
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694110-DNA\_D01\_24marq
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694110-DNA\_D02\_L2
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694110-DNA\_D03\_17m
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694110-DNA\_D04\_10kis2
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1.000
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694110-DNA\_D05\_9mks2
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+1
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694110-DNA\_D06\_2kisX1
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694110-DNA\_D07\_15kis211
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+1.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694110-DNA\_D08\_2kis1
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+1.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694110-DNA\_D09\_2kisPK\_19
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+1.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694110-DNA\_D10\_5kis\_21
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+1.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694110-DNA\_D12\_11kis1
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+1.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694110-DNA\_E01\_10kisZ
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1.000
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694110-DNA\_E02\_1lub\_bel\_2712
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+1.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694110-DNA\_E03\_4kis\_2612
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+1.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694110-DNA\_E04\_10kis\_Z1
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1.000
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694110-DNA\_E05\_13kis2
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+1.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694110-DNA\_E06\_3kis21
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+1.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694110-DNA\_E07\_16kis21
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+1.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694110-DNA\_E08\_8kis21
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+1.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694110-DNA\_E09\_3kis3112
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+1.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694110-DNA\_E10\_XY1
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1.000
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694110-DNA\_E12\_kisX1
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1.000
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694110-DNA\_F01\_34m1
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694110-DNA\_F02\_3kis\_P
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694110-DNA\_F04\_11kis44
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+1.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694110-DNA\_F05\_Tsp\_2512
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+1.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694110-DNA\_F06\_5kis2
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1.000
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694110-DNA\_F09\_44m1
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694110-DNA\_F10\_6m2
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694110-DNA\_F11\_2PK19\_2612
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+1.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694110-DNA\_F12\_12kis21Z
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+1.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694110-DNA\_G01\_2LB1
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+1.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694110-DNA\_G02\_35m2
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+1.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694110-DNA\_G03\_8Tsp\_2512
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0.059
+</td>
+<td style="text-align:right;">
+0.941
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694110-DNA\_G04\_9tshp
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+1
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694110-DNA\_G05\_2kisN
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+1.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694110-DNA\_G06\_2kis2A
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694110-DNA\_G07\_11kis
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+1.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694110-DNA\_G08\_5kin
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1.000
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694110-DNA\_G09\_10kis\_N
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1.000
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694110-DNA\_G10\_N2
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694110-DNA\_G11\_D1
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+1
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694110-DNA\_G12\_41m
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694110-DNA\_H01\_67styl1
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694110-DNA\_H02\_49m
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694110-DNA\_H03\_27m
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694110-DNA\_H04\_30m
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694110-DNA\_H05\_H3
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694110-DNA\_H06\_26m
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694110-DNA\_H07\_4lukusa
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+1.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694110-DNA\_H09\_D2
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694110-DNA\_H11\_K1
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694110-DNA\_H12\_B21
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694111-DNA\_A01\_47m
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1.000
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694111-DNA\_A02\_10kis21
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+1.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694111-DNA\_C01\_1kis21
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+1.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694111-DNA\_D01\_45m
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694111-DNA\_D02\_2kis\_2612
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+1.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694111-DNA\_E01\_28m
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694111-DNA\_F01\_67styl
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694111-DNA\_G01\_6styl
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+1.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WG6694111-DNA\_H01\_10kis214
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1.000
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+</tbody>
+</table>
+
+The prior group assignments (from find.clusters) and the post group
+assignments (from dapc) don’t differ much, only at group 3 and 4 by one
+individual.
+
+The slot `assign.per.pop` indicates the proportions of successful
+reassignment (based on the discriminant functions) of individuals to
+their original clusters. Large values indicate clear-cut clusters, while
+low values suggest admixed groups.
+
+This information can also be visualized using `assignplot`
+
+``` r
+assignplot(dapc1_pat)
+```
+
+![](SNP-Chip_Data_Analysis_with_Plink_and_R_files/figure-gfm/unnamed-chunk-8-1.png)<!-- -->
+
+Heat colors represent membership probabilities (red=1, white=0); blue
+crosses represent the prior cluster provided to DAPC. Here DAPC
+classification is consistent with the original clusters (blue crosses
+are on red rectangles).
+
+This information can also be plotted in the more common STRUCTURE-like
+way using `compoplot`
+
+``` r
+require(RColorBrewer)
+
+myCol <-  brewer.pal(5, "Accent") # choose some colors
+compoplot(dapc1_pat, posi="bottomright", txt.leg=paste("Cluster", 1:5), lab="", xlab="individuals", col=myCol)
+```
+
+![](SNP-Chip_Data_Analysis_with_Plink_and_R_files/figure-gfm/unnamed-chunk-9-1.png)<!-- -->
+
+We also need to arrange the individuals by cluster to have a better
+looking plot. \#\#\#\# Checking the stabilty of group memberships
+
+We need to check if our assignments to the groups is correct. As said
+before it is important to be careful of the number of PCs and
+discriminant functions we keep in the initial analysis. Hence we check
+that with a few steps.
+
+Then after we can try and see of the the assignments would match with
+the trait to assign population from the metadata we have for the dat.
+
 ## Session Info
 
 Details of packages used with the work flow
@@ -845,104 +6245,113 @@ devtools::session_info()
     ##  date     2021-04-09                  
     ## 
     ## - Packages -------------------------------------------------------------------
-    ##  package     * version date       lib source        
-    ##  ade4        * 1.7-16  2020-10-28 [2] CRAN (R 4.0.3)
-    ##  adegenet    * 2.1.3   2020-05-10 [2] CRAN (R 4.0.4)
-    ##  ape         * 5.4-1   2020-08-13 [2] CRAN (R 4.0.3)
-    ##  assertthat    0.2.1   2019-03-21 [2] CRAN (R 4.0.3)
-    ##  boot          1.3-25  2020-04-26 [2] CRAN (R 4.0.3)
-    ##  callr         3.5.1   2020-10-13 [2] CRAN (R 4.0.3)
-    ##  class         7.3-17  2020-04-26 [2] CRAN (R 4.0.3)
-    ##  classInt      0.4-3   2020-04-07 [2] CRAN (R 4.0.4)
-    ##  cli           2.2.0   2020-11-20 [2] CRAN (R 4.0.3)
-    ##  cluster       2.1.0   2019-06-19 [2] CRAN (R 4.0.3)
-    ##  coda          0.19-4  2020-09-30 [2] CRAN (R 4.0.4)
-    ##  codetools     0.2-18  2020-11-04 [2] CRAN (R 4.0.3)
-    ##  colorspace    2.0-0   2020-11-11 [2] CRAN (R 4.0.3)
-    ##  crayon        1.3.4   2017-09-16 [2] CRAN (R 4.0.3)
-    ##  DBI           1.1.1   2021-01-15 [2] CRAN (R 4.0.3)
-    ##  deldir        0.2-10  2021-02-16 [2] CRAN (R 4.0.4)
-    ##  desc          1.2.0   2018-05-01 [2] CRAN (R 4.0.3)
-    ##  devtools      2.3.2   2020-09-18 [2] CRAN (R 4.0.3)
-    ##  digest        0.6.27  2020-10-24 [1] CRAN (R 4.0.3)
-    ##  dplyr         1.0.3   2021-01-15 [2] CRAN (R 4.0.3)
-    ##  e1071         1.7-6   2021-03-18 [2] CRAN (R 4.0.4)
-    ##  ellipsis      0.3.1   2020-05-15 [2] CRAN (R 4.0.3)
-    ##  evaluate      0.14    2019-05-28 [2] CRAN (R 4.0.3)
-    ##  expm          0.999-6 2021-01-13 [2] CRAN (R 4.0.4)
-    ##  fansi         0.4.2   2021-01-15 [2] CRAN (R 4.0.3)
-    ##  farver        2.0.3   2020-01-16 [2] CRAN (R 4.0.3)
-    ##  fastmap       1.0.1   2019-10-08 [2] CRAN (R 4.0.3)
-    ##  fs            1.5.0   2020-07-31 [2] CRAN (R 4.0.3)
-    ##  gdata         2.18.0  2017-06-06 [2] CRAN (R 4.0.3)
-    ##  generics      0.1.0   2020-10-31 [2] CRAN (R 4.0.3)
-    ##  ggplot2     * 3.3.3   2020-12-30 [2] CRAN (R 4.0.3)
-    ##  glue          1.4.2   2020-08-27 [2] CRAN (R 4.0.3)
-    ##  gmodels       2.18.1  2018-06-25 [2] CRAN (R 4.0.4)
-    ##  gtable        0.3.0   2019-03-25 [2] CRAN (R 4.0.3)
-    ##  gtools        3.8.2   2020-03-31 [2] CRAN (R 4.0.3)
-    ##  hms           1.0.0   2021-01-13 [2] CRAN (R 4.0.3)
-    ##  htmltools     0.5.1   2021-01-12 [2] CRAN (R 4.0.3)
-    ##  httpuv        1.5.5   2021-01-13 [2] CRAN (R 4.0.3)
-    ##  igraph        1.2.6   2020-10-06 [2] CRAN (R 4.0.3)
-    ##  KernSmooth    2.23-18 2020-10-29 [2] CRAN (R 4.0.3)
-    ##  knitr         1.30    2020-09-22 [2] CRAN (R 4.0.3)
-    ##  labeling      0.4.2   2020-10-20 [2] CRAN (R 4.0.3)
-    ##  later         1.1.0.1 2020-06-05 [2] CRAN (R 4.0.3)
-    ##  lattice       0.20-41 2020-04-02 [2] CRAN (R 4.0.3)
-    ##  LearnBayes    2.15.1  2018-03-18 [2] CRAN (R 4.0.3)
-    ##  lifecycle     0.2.0   2020-03-06 [2] CRAN (R 4.0.3)
-    ##  magrittr      2.0.1   2020-11-17 [2] CRAN (R 4.0.3)
-    ##  MASS          7.3-53  2020-09-09 [2] CRAN (R 4.0.3)
-    ##  Matrix        1.3-2   2021-01-06 [2] CRAN (R 4.0.3)
-    ##  memoise       1.1.0   2017-04-21 [2] CRAN (R 4.0.3)
-    ##  mgcv          1.8-33  2020-08-27 [2] CRAN (R 4.0.3)
-    ##  mime          0.9     2020-02-04 [2] CRAN (R 4.0.3)
-    ##  munsell       0.5.0   2018-06-12 [2] CRAN (R 4.0.3)
-    ##  nlme          3.1-151 2020-12-10 [2] CRAN (R 4.0.3)
-    ##  pegas       * 0.14    2020-09-16 [2] CRAN (R 4.0.4)
-    ##  permute       0.9-5   2019-03-12 [2] CRAN (R 4.0.3)
-    ##  pillar        1.4.7   2020-11-20 [2] CRAN (R 4.0.3)
-    ##  pkgbuild      1.2.0   2020-12-15 [2] CRAN (R 4.0.3)
-    ##  pkgconfig     2.0.3   2019-09-22 [2] CRAN (R 4.0.3)
-    ##  pkgload       1.1.0   2020-05-29 [2] CRAN (R 4.0.3)
-    ##  plyr          1.8.6   2020-03-03 [2] CRAN (R 4.0.3)
-    ##  prettyunits   1.1.1   2020-01-24 [2] CRAN (R 4.0.3)
-    ##  processx      3.4.5   2020-11-30 [2] CRAN (R 4.0.3)
-    ##  progress      1.2.2   2019-05-16 [2] CRAN (R 4.0.3)
-    ##  promises      1.1.1   2020-06-09 [2] CRAN (R 4.0.3)
-    ##  proxy         0.4-25  2021-03-05 [2] CRAN (R 4.0.4)
-    ##  ps            1.5.0   2020-12-05 [2] CRAN (R 4.0.3)
-    ##  purrr         0.3.4   2020-04-17 [2] CRAN (R 4.0.3)
-    ##  R6            2.5.0   2020-10-28 [2] CRAN (R 4.0.3)
-    ##  raster        3.4-5   2020-11-14 [2] CRAN (R 4.0.4)
-    ##  Rcpp          1.0.6   2021-01-15 [2] CRAN (R 4.0.3)
-    ##  remotes       2.2.0   2020-07-21 [2] CRAN (R 4.0.3)
-    ##  reshape2      1.4.4   2020-04-09 [2] CRAN (R 4.0.3)
-    ##  rlang         0.4.10  2020-12-30 [2] CRAN (R 4.0.3)
-    ##  rmarkdown     2.6     2020-12-14 [2] CRAN (R 4.0.3)
-    ##  rprojroot     2.0.2   2020-11-15 [2] CRAN (R 4.0.3)
-    ##  scales        1.1.1   2020-05-11 [2] CRAN (R 4.0.3)
-    ##  seqinr        4.2-5   2020-12-17 [2] CRAN (R 4.0.4)
-    ##  sessioninfo   1.1.1   2018-11-05 [2] CRAN (R 4.0.3)
-    ##  sf            0.9-8   2021-03-17 [2] CRAN (R 4.0.4)
-    ##  shiny         1.5.0   2020-06-23 [2] CRAN (R 4.0.3)
-    ##  sp            1.4-5   2021-01-10 [2] CRAN (R 4.0.3)
-    ##  spData        0.3.8   2020-07-03 [2] CRAN (R 4.0.4)
-    ##  spdep         1.1-7   2021-04-03 [2] CRAN (R 4.0.5)
-    ##  stringi       1.5.3   2020-09-09 [2] CRAN (R 4.0.3)
-    ##  stringr       1.4.0   2019-02-10 [2] CRAN (R 4.0.3)
-    ##  testthat      3.0.1   2020-12-17 [2] CRAN (R 4.0.3)
-    ##  tibble        3.0.5   2021-01-15 [2] CRAN (R 4.0.3)
-    ##  tidyselect    1.1.0   2020-05-11 [2] CRAN (R 4.0.3)
-    ##  units         0.7-1   2021-03-16 [2] CRAN (R 4.0.4)
-    ##  usethis       2.0.0   2020-12-10 [2] CRAN (R 4.0.3)
-    ##  vctrs         0.3.6   2020-12-17 [2] CRAN (R 4.0.3)
-    ##  vegan         2.5-7   2020-11-28 [2] CRAN (R 4.0.3)
-    ##  withr         2.4.0   2021-01-16 [2] CRAN (R 4.0.3)
-    ##  xfun          0.20    2021-01-06 [2] CRAN (R 4.0.3)
-    ##  xtable        1.8-4   2019-04-21 [2] CRAN (R 4.0.3)
-    ##  yaml          2.2.1   2020-02-01 [2] CRAN (R 4.0.3)
+    ##  package      * version date       lib source        
+    ##  ade4         * 1.7-16  2020-10-28 [2] CRAN (R 4.0.3)
+    ##  adegenet     * 2.1.3   2020-05-10 [2] CRAN (R 4.0.4)
+    ##  ape          * 5.4-1   2020-08-13 [2] CRAN (R 4.0.3)
+    ##  assertthat     0.2.1   2019-03-21 [2] CRAN (R 4.0.3)
+    ##  boot           1.3-25  2020-04-26 [2] CRAN (R 4.0.3)
+    ##  callr          3.5.1   2020-10-13 [2] CRAN (R 4.0.3)
+    ##  class          7.3-17  2020-04-26 [2] CRAN (R 4.0.3)
+    ##  classInt       0.4-3   2020-04-07 [2] CRAN (R 4.0.4)
+    ##  cli            2.2.0   2020-11-20 [2] CRAN (R 4.0.3)
+    ##  cluster        2.1.0   2019-06-19 [2] CRAN (R 4.0.3)
+    ##  coda           0.19-4  2020-09-30 [2] CRAN (R 4.0.4)
+    ##  codetools      0.2-18  2020-11-04 [2] CRAN (R 4.0.3)
+    ##  colorspace     2.0-0   2020-11-11 [2] CRAN (R 4.0.3)
+    ##  crayon         1.3.4   2017-09-16 [2] CRAN (R 4.0.3)
+    ##  DBI            1.1.1   2021-01-15 [2] CRAN (R 4.0.3)
+    ##  deldir         0.2-10  2021-02-16 [2] CRAN (R 4.0.4)
+    ##  desc           1.2.0   2018-05-01 [2] CRAN (R 4.0.3)
+    ##  devtools       2.3.2   2020-09-18 [2] CRAN (R 4.0.3)
+    ##  digest         0.6.27  2020-10-24 [1] CRAN (R 4.0.3)
+    ##  dplyr          1.0.3   2021-01-15 [2] CRAN (R 4.0.3)
+    ##  e1071          1.7-6   2021-03-18 [2] CRAN (R 4.0.4)
+    ##  ellipsis       0.3.1   2020-05-15 [2] CRAN (R 4.0.3)
+    ##  evaluate       0.14    2019-05-28 [2] CRAN (R 4.0.3)
+    ##  expm           0.999-6 2021-01-13 [2] CRAN (R 4.0.4)
+    ##  fansi          0.4.2   2021-01-15 [2] CRAN (R 4.0.3)
+    ##  farver         2.0.3   2020-01-16 [2] CRAN (R 4.0.3)
+    ##  fastmap        1.0.1   2019-10-08 [2] CRAN (R 4.0.3)
+    ##  fs             1.5.0   2020-07-31 [2] CRAN (R 4.0.3)
+    ##  gdata          2.18.0  2017-06-06 [2] CRAN (R 4.0.3)
+    ##  generics       0.1.0   2020-10-31 [2] CRAN (R 4.0.3)
+    ##  ggplot2      * 3.3.3   2020-12-30 [2] CRAN (R 4.0.3)
+    ##  glue           1.4.2   2020-08-27 [2] CRAN (R 4.0.3)
+    ##  gmodels        2.18.1  2018-06-25 [2] CRAN (R 4.0.4)
+    ##  gtable         0.3.0   2019-03-25 [2] CRAN (R 4.0.3)
+    ##  gtools         3.8.2   2020-03-31 [2] CRAN (R 4.0.3)
+    ##  highr          0.8     2019-03-20 [2] CRAN (R 4.0.3)
+    ##  hms            1.0.0   2021-01-13 [2] CRAN (R 4.0.3)
+    ##  htmltools      0.5.1   2021-01-12 [2] CRAN (R 4.0.3)
+    ##  httpuv         1.5.5   2021-01-13 [2] CRAN (R 4.0.3)
+    ##  httr           1.4.2   2020-07-20 [2] CRAN (R 4.0.3)
+    ##  igraph         1.2.6   2020-10-06 [2] CRAN (R 4.0.3)
+    ##  kableExtra     1.3.1   2020-10-22 [2] CRAN (R 4.0.3)
+    ##  KernSmooth     2.23-18 2020-10-29 [2] CRAN (R 4.0.3)
+    ##  knitr          1.30    2020-09-22 [2] CRAN (R 4.0.3)
+    ##  labeling       0.4.2   2020-10-20 [2] CRAN (R 4.0.3)
+    ##  later          1.1.0.1 2020-06-05 [2] CRAN (R 4.0.3)
+    ##  lattice        0.20-41 2020-04-02 [2] CRAN (R 4.0.3)
+    ##  LearnBayes     2.15.1  2018-03-18 [2] CRAN (R 4.0.3)
+    ##  lifecycle      0.2.0   2020-03-06 [2] CRAN (R 4.0.3)
+    ##  magrittr       2.0.1   2020-11-17 [2] CRAN (R 4.0.3)
+    ##  MASS           7.3-53  2020-09-09 [2] CRAN (R 4.0.3)
+    ##  Matrix         1.3-2   2021-01-06 [2] CRAN (R 4.0.3)
+    ##  memoise        1.1.0   2017-04-21 [2] CRAN (R 4.0.3)
+    ##  mgcv           1.8-33  2020-08-27 [2] CRAN (R 4.0.3)
+    ##  mime           0.9     2020-02-04 [2] CRAN (R 4.0.3)
+    ##  munsell        0.5.0   2018-06-12 [2] CRAN (R 4.0.3)
+    ##  nlme           3.1-151 2020-12-10 [2] CRAN (R 4.0.3)
+    ##  pegas        * 0.14    2020-09-16 [2] CRAN (R 4.0.4)
+    ##  permute        0.9-5   2019-03-12 [2] CRAN (R 4.0.3)
+    ##  pillar         1.4.7   2020-11-20 [2] CRAN (R 4.0.3)
+    ##  pkgbuild       1.2.0   2020-12-15 [2] CRAN (R 4.0.3)
+    ##  pkgconfig      2.0.3   2019-09-22 [2] CRAN (R 4.0.3)
+    ##  pkgload        1.1.0   2020-05-29 [2] CRAN (R 4.0.3)
+    ##  plyr           1.8.6   2020-03-03 [2] CRAN (R 4.0.3)
+    ##  prettyunits    1.1.1   2020-01-24 [2] CRAN (R 4.0.3)
+    ##  processx       3.4.5   2020-11-30 [2] CRAN (R 4.0.3)
+    ##  progress       1.2.2   2019-05-16 [2] CRAN (R 4.0.3)
+    ##  promises       1.1.1   2020-06-09 [2] CRAN (R 4.0.3)
+    ##  proxy          0.4-25  2021-03-05 [2] CRAN (R 4.0.4)
+    ##  ps             1.5.0   2020-12-05 [2] CRAN (R 4.0.3)
+    ##  purrr          0.3.4   2020-04-17 [2] CRAN (R 4.0.3)
+    ##  R6             2.5.0   2020-10-28 [2] CRAN (R 4.0.3)
+    ##  raster         3.4-5   2020-11-14 [2] CRAN (R 4.0.4)
+    ##  RColorBrewer * 1.1-2   2014-12-07 [2] CRAN (R 4.0.3)
+    ##  Rcpp           1.0.6   2021-01-15 [2] CRAN (R 4.0.3)
+    ##  remotes        2.2.0   2020-07-21 [2] CRAN (R 4.0.3)
+    ##  reshape2       1.4.4   2020-04-09 [2] CRAN (R 4.0.3)
+    ##  rlang          0.4.10  2020-12-30 [2] CRAN (R 4.0.3)
+    ##  rmarkdown      2.6     2020-12-14 [2] CRAN (R 4.0.3)
+    ##  rprojroot      2.0.2   2020-11-15 [2] CRAN (R 4.0.3)
+    ##  rstudioapi     0.13    2020-11-12 [2] CRAN (R 4.0.3)
+    ##  rvest          0.3.6   2020-07-25 [2] CRAN (R 4.0.3)
+    ##  scales         1.1.1   2020-05-11 [2] CRAN (R 4.0.3)
+    ##  seqinr         4.2-5   2020-12-17 [2] CRAN (R 4.0.4)
+    ##  sessioninfo    1.1.1   2018-11-05 [2] CRAN (R 4.0.3)
+    ##  sf             0.9-8   2021-03-17 [2] CRAN (R 4.0.4)
+    ##  shiny          1.5.0   2020-06-23 [2] CRAN (R 4.0.3)
+    ##  sp             1.4-5   2021-01-10 [2] CRAN (R 4.0.3)
+    ##  spData         0.3.8   2020-07-03 [2] CRAN (R 4.0.4)
+    ##  spdep          1.1-7   2021-04-03 [2] CRAN (R 4.0.5)
+    ##  stringi        1.5.3   2020-09-09 [2] CRAN (R 4.0.3)
+    ##  stringr        1.4.0   2019-02-10 [2] CRAN (R 4.0.3)
+    ##  testthat       3.0.1   2020-12-17 [2] CRAN (R 4.0.3)
+    ##  tibble         3.0.5   2021-01-15 [2] CRAN (R 4.0.3)
+    ##  tidyselect     1.1.0   2020-05-11 [2] CRAN (R 4.0.3)
+    ##  units          0.7-1   2021-03-16 [2] CRAN (R 4.0.4)
+    ##  usethis        2.0.0   2020-12-10 [2] CRAN (R 4.0.3)
+    ##  vctrs          0.3.6   2020-12-17 [2] CRAN (R 4.0.3)
+    ##  vegan          2.5-7   2020-11-28 [2] CRAN (R 4.0.3)
+    ##  viridisLite    0.3.0   2018-02-01 [2] CRAN (R 4.0.3)
+    ##  webshot        0.5.2   2019-11-22 [2] CRAN (R 4.0.3)
+    ##  withr          2.4.0   2021-01-16 [2] CRAN (R 4.0.3)
+    ##  xfun           0.20    2021-01-06 [2] CRAN (R 4.0.3)
+    ##  xml2           1.3.2   2020-04-23 [2] CRAN (R 4.0.3)
+    ##  xtable         1.8-4   2019-04-21 [2] CRAN (R 4.0.3)
+    ##  yaml           2.2.1   2020-02-01 [2] CRAN (R 4.0.3)
     ## 
     ## [1] C:/Users/BWaweru/OneDrive - CGIAR/Documents/R/win-library/4.0
     ## [2] C:/R/R-4.0.3/library
