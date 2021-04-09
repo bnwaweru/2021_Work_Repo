@@ -1,7 +1,7 @@
 SNPChip\_Data\_Analysis\_with\_Plink\_and\_R
 ================
 Bernice Waweru
-Wed 07, Apr 2021
+Fri 09, Apr 2021
 
 -   [Objective and information on
     data](#objective-and-information-on-data)
@@ -26,6 +26,7 @@ Wed 07, Apr 2021
     -   [Analysis in R](#analysis-in-r)
         -   [Anlaysis of data with
             *Adegenet*](#anlaysis-of-data-with-adegenet)
+            -   [Using `find.clusters`](#using-find.clusters)
     -   [Session Info](#session-info)
 
 # Objective and information on data
@@ -702,9 +703,126 @@ saved from the plink pipeline.
 
 require(adegenet)
 require(pegas)
+setwd("C:/Users/BWaweru/OneDrive - CGIAR/Documents/Fellows/Goat_diversity_project_fellow/Patrick_Baenyi/RWD/2021_Work_Repo")
 
 # ===== load the data and save it as an RData object
+#read.PLINK("data-raw/plink.raw", map.file = "data-raw/bin_patrick_2021_prnd_NB.map")
 ```
+
+Internally most `adegenet` functions will call the tool parallel to try
+and maximise the number of core available for its use to run the jobs in
+parallel i.e multi-thread.
+
+Add the arguments `parallel=FALSE` to avoid getting the above error.
+Found this solution
+[here](https://github.com/thibautjombart/adegenet/issues/126).
+
+``` r
+read.PLINK("data-raw/plink.raw", map.file = "data-raw/bin_patrick_2021_prnd_NB.map", parallel = FALSE) -> pat_dat
+```
+
+    FALSE 
+    FALSE  Reading PLINK raw format into a genlight object... 
+    FALSE 
+    FALSE 
+    FALSE  Reading loci information... 
+    FALSE 
+    FALSE  Reading and converting genotypes... 
+    FALSE .
+    FALSE  Building final object... 
+    FALSE 
+    FALSE ...done.
+
+``` r
+# ===== save data for easly loading next time
+
+save(pat_dat, file = "results/pat_data.RData") # much lighter, only 2.8Mb, original data is 23.1 Mb + 1.8 Mb
+```
+
+Check that the loaded data is okay
+
+``` r
+# ==== summary
+pat_dat
+```
+
+    FALSE  /// GENLIGHT OBJECT /////////
+    FALSE 
+    FALSE  // 259 genotypes,  44,099 binary SNPs, size: 7.3 Mb
+    FALSE  43188 (0.38 %) missing data
+    FALSE 
+    FALSE  // Basic content
+    FALSE    @gen: list of 259 SNPbin
+    FALSE    @ploidy: ploidy of each individual  (range: 2-2)
+    FALSE 
+    FALSE  // Optional content
+    FALSE    @ind.names:  259 individual labels
+    FALSE    @loc.names:  44099 locus labels
+    FALSE    @chromosome: factor storing chromosomes of the SNPs
+    FALSE    @position: integer storing positions of the SNPs
+    FALSE    @pop: population of each individual (group size range: 1-1)
+    FALSE    @other: a list containing: sex  phenotype  pat  mat
+
+``` r
+# ==== individual names
+
+indNames(pat_dat)[1:10]
+```
+
+    FALSE  [1] "WG6694108-DNA_A01_110kin"  "WG6694108-DNA_A02_105kin1"
+    FALSE  [3] "WG6694108-DNA_A03_55kin"   "WG6694108-DNA_A04_50kin"  
+    FALSE  [5] "WG6694108-DNA_A05_104kin"  "WG6694108-DNA_A06_82kin"  
+    FALSE  [7] "WG6694108-DNA_A07_75kin1"  "WG6694108-DNA_A08_110kin1"
+    FALSE  [9] "WG6694108-DNA_A09_77kin"   "WG6694108-DNA_A10_Zkin2"
+
+``` r
+# ===== loci names
+
+locNames(pat_dat)[1:10]
+```
+
+    FALSE  [1] "snp14099-scaffold1560-920888_G"  "snp14100-scaffold1560-986550_G" 
+    FALSE  [3] "snp14101-scaffold1560-1032913_A" "snp2819-scaffold1082-727669_A"  
+    FALSE  [5] "snp2817-scaffold1082-658683_A"   "snp2816-scaffold1082-615033_G"  
+    FALSE  [7] "snp2815-scaffold1082-557554_A"   "snp2812-scaffold1082-438570_A"  
+    FALSE  [9] "snp2810-scaffold1082-348665_G"   "snp2809-scaffold1082-312463_A"
+
+#### Using `find.clusters`
+
+This function first transforms the data using PCA, asking the user to
+specify the number of retained PCs interactively unless the argument
+`n.pca` is provided.
+
+We use `find.clusters` to identify potential clusters within our
+dataset, although as of now the true clusters are unknown. We evaluate
+*k= 20* clusters, a theoretical value, with `max.n.clust = 40`
+
+``` r
+ grp <- find.clusters(pat_dat, max.n.clust = 20) 
+# ==== above command takes quite a while and is interactive
+
+# ===== because this take long and requires interactively selecting the number of pcs and clusters to keep, we save the grp objects as an RData file
+
+# ===== we can then load when we need to use it downstream
+
+save(grp, file = "results/grp.RData")
+```
+
+The function displays a graph of cumulated variance explained by the
+eigenvalues of the PCA.
+
+![cumulated variance explained by
+PCA](./embedded-images/variance_explained_by_PCA_200_selected.PNG)
+
+We selected to keep 200 PCs, this value is probably too high, but as it
+is the first trial, we can go lower next time.
+
+It also displays a graph of BIC values for increasing values of k, i,e
+the clusters, where selected to keep 5 clusters, as that is where there
+seems to be a clear elbow,
+
+![value of BIC
+values](./embedded-images/value_of_BIC_versus_number_of_clusters_5_selected.PNG)
 
 ## Session Info
 
@@ -724,7 +842,7 @@ devtools::session_info()
     ##  collate  English_United States.1252  
     ##  ctype    English_United States.1252  
     ##  tz       Africa/Nairobi              
-    ##  date     2021-04-07                  
+    ##  date     2021-04-09                  
     ## 
     ## - Packages -------------------------------------------------------------------
     ##  package     * version date       lib source        
