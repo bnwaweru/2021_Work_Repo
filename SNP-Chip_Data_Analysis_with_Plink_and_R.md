@@ -1,7 +1,7 @@
 SNPChip\_Data\_Analysis\_with\_Plink\_and\_R
 ================
 Bernice Waweru
-Fri 09, Apr 2021
+Mon 12, Apr 2021
 
 -   [Objective and information on
     data](#objective-and-information-on-data)
@@ -29,6 +29,8 @@ Fri 09, Apr 2021
             -   [Using `find.clusters`](#using-find.clusters)
             -   [Describing clusters using
                 **DAPC**](#describing-clusters-using-dapc)
+            -   [Checking the stabilty of group
+                memberships](#checking-the-stabilty-of-group-memberships)
     -   [Session Info](#session-info)
 
 # Objective and information on data
@@ -6214,7 +6216,9 @@ compoplot(dapc1_pat, posi="bottomright", txt.leg=paste("Cluster", 1:5), lab="", 
 ![](SNP-Chip_Data_Analysis_with_Plink_and_R_files/figure-gfm/unnamed-chunk-9-1.png)<!-- -->
 
 We also need to arrange the individuals by cluster to have a better
-looking plot. \#\#\#\# Checking the stabilty of group memberships
+looking plot.
+
+#### Checking the stabilty of group memberships
 
 We need to check if our assignments to the groups is correct. As said
 before it is important to be careful of the number of PCs and
@@ -6242,7 +6246,7 @@ devtools::session_info()
     ##  collate  English_United States.1252  
     ##  ctype    English_United States.1252  
     ##  tz       Africa/Nairobi              
-    ##  date     2021-04-09                  
+    ##  date     2021-04-12                  
     ## 
     ## - Packages -------------------------------------------------------------------
     ##  package      * version date       lib source        
