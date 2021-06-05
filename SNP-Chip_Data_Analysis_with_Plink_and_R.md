@@ -1,12 +1,12 @@
 SNPChip\_Data\_Analysis\_with\_Plink\_and\_R
 ================
 Bernice Waweru
-Mon 12, Apr 2021
+Thu 27, May 2021
 
 -   [Objective and information on
     data](#objective-and-information-on-data)
 -   [Analysis with
-    *`Plink, version 1.9 and 2.00-alpha`*](#analysis-with-plink-version-1.9-and-2.00-alpha)
+    *`Plink, version 1.9 and 2.00-alpha`*](#analysis-with-plink-version-19-and-200-alpha)
     -   [Summary Statistics](#summary-statistics)
         -   [Allele frequencies](#allele-frequencies)
         -   [Missing rates for individuals and the
@@ -24,9 +24,9 @@ Mon 12, Apr 2021
             pruning](#linkage-disequilibrium-based-snp-pruning)
     -   [Population Stratification](#population-stratification)
     -   [Analysis in R](#analysis-in-r)
-        -   [Anlaysis of data with
-            *Adegenet*](#anlaysis-of-data-with-adegenet)
-            -   [Using `find.clusters`](#using-find.clusters)
+        -   [Analysis of data with
+            *Adegenet*](#analysis-of-data-with-adegenet)
+            -   [Using `find.clusters`](#using-findclusters)
             -   [Describing clusters using
                 **DAPC**](#describing-clusters-using-dapc)
             -   [Checking the stabilty of group
@@ -694,7 +694,7 @@ print(mds_plot)
 # ===== we add phenotype data to the plot to add more aesthetics to the plot, i.e color, and sample names.
 ```
 
-### Anlaysis of data with [*Adegenet*](https://cran.r-project.org/web/packages/adegenet/adegenet.pdf)
+### Analysis of data with [*Adegenet*](https://cran.r-project.org/web/packages/adegenet/adegenet.pdf)
 
 We install the packages *adegenet* and *pegas* that we will require to
 look into population structure. We will make use of the data that we
@@ -802,10 +802,10 @@ specify the number of retained PCs interactively unless the argument
 
 We use `find.clusters` to identify potential clusters within our
 dataset, although as of now the true clusters are unknown. We evaluate
-*k= 20* clusters, a theoretical value, with `max.n.clust = 40`
+*k= 20* clusters, a theoretical value, with `max.n.clust = 20`
 
 ``` r
- grp <- find.clusters(pat_dat, max.n.clust = 20) 
+ #grp <- find.clusters(pat_dat, max.n.clust = 20, n.pca = 50, n.clust = 4) 
 # ==== above command takes quite a while and is interactive
 
 # ===== because this take long and requires interactively selecting the number of pcs and clusters to keep, we save the grp objects as an RData file
@@ -822,10 +822,11 @@ eigenvalues of the PCA.
 PCA](./embedded-images/variance_explained_by_PCA_200_selected.PNG)
 
 We selected to keep 200 PCs, this value is probably too high, but as it
-is the first trial, we can go lower next time.
+is the first trial, we can go lower next time. In the rerun, we chose to
+keep 50 pcs and 4 clusters.
 
 It also displays a graph of BIC values for increasing values of k, i,e
-the clusters, where selected to keep 5 clusters, as that is where there
+the clusters, where selected to keep 4 clusters, as that is where there
 seems to be a clear elbow,
 
 ![value of BIC
@@ -840,7 +841,7 @@ names(grp)
 
     ## [1] "Kstat" "stat"  "grp"   "size"
 
-Assigned groups are stored under `grp$grp`, as per the 5 clusters we
+Assigned groups are stored under `grp$grp`, as per the 4 clusters we
 chose to keep
 
 ``` r
@@ -848,14 +849,14 @@ grp$grp[1:10]
 ```
 
     ##  WG6694108-DNA_A01_110kin WG6694108-DNA_A02_105kin1   WG6694108-DNA_A03_55kin 
-    ##                         3                         4                         3 
+    ##                         4                         3                         4 
     ##   WG6694108-DNA_A04_50kin  WG6694108-DNA_A05_104kin   WG6694108-DNA_A06_82kin 
-    ##                         3                         3                         3 
+    ##                         4                         4                         4 
     ##  WG6694108-DNA_A07_75kin1 WG6694108-DNA_A08_110kin1   WG6694108-DNA_A09_77kin 
-    ##                         3                         3                         3 
+    ##                         4                         4                         4 
     ##   WG6694108-DNA_A10_Zkin2 
-    ##                         1 
-    ## Levels: 1 2 3 4 5
+    ##                         4 
+    ## Levels: 1 2 3 4
 
 #### Describing clusters using **DAPC**
 
@@ -882,7 +883,7 @@ too many PCs. The bottom-line is therefore retaining a few PCs without
 sacrificing too much information. We see very little information gained
 by adding PC’s after around 30, hence we retain 30.
 
-![dapc\_variance\_grapgh](embedded-images/dapc_variance_graph.PNG)
+![dapc\_variance\_graph](embedded-images/dapc_variance_graph.PNG)
 
 The method also displays a barplot of eigen-values for the discriminant
 analysis asking for number of discriminant function to keep, we keep all
@@ -892,14 +893,14 @@ analysis asking for number of discriminant function to keep, we keep all
 
 The object dapc1\_pat contains a lot of information:
 
-![dapc1\_pat\_infor](embedded-images/dapc1_pat_infor.PNG)
-
 ``` r
-dapc1_pat
-
 # ===== we also save the object so we can call into memomry whenever we need to use it
 
-save(dapc1_pat, file = "./results/dapc1_pat.RData")
+#save(dapc1_pat, file = "./results/dapc1_pat.RData")
+
+load("results/dapc1_pat.RData")
+
+dapc1_pat
 ```
 
 Essentially, the slots `ind.coord` and `grp.coord` contain the
@@ -907,7 +908,7 @@ coordinates of then individuals and of the groups used in scatter plots.
 Basic scatter plots can be obtained using the function `scatterplot`:
 
 ``` r
-load("./results/dapc1_pat.RData")
+load("results/dapc1_pat.RData")
 
 scatter(dapc1_pat)
 ```
@@ -919,7 +920,7 @@ scatter(dapc1_pat)
 require(RColorBrewer)
 myCol <-  brewer.pal(5, "Set1") # choose some colors
 
-scatter(dapc1_pat, scree.da=TRUE,scree.pca = TRUE, bg="white", pch=20, cell=0, cstar=0, col=myCol, solid=.4, cex=3,clab=0, leg=TRUE, txt.leg=paste("Cluster",1:5))
+scatter(dapc1_pat, scree.da=TRUE,scree.pca = TRUE, bg="white", pch=20, cell=0, cstar=0, col=myCol, solid=.4, cex=3,clab=0, leg=TRUE, txt.leg=paste("Cluster",1:4))
 ```
 
 ![](SNP-Chip_Data_Analysis_with_Plink_and_R_files/figure-gfm/unnamed-chunk-5-2.png)<!-- -->
@@ -932,7 +933,7 @@ We can explore this a bit further with caution. In the manual it states
 based on too many PCs, as there are risks of over-fitting the
 discriminant functions*
 
-We kept 30 PCs and 4 discriminant functions.
+We kept 30 PCs and 3 discriminant functions.
 
 Let’s look at a summary of the dapc object
 
@@ -941,27 +942,27 @@ summary(dapc1_pat)
 ```
 
     ## $n.dim
-    ## [1] 4
+    ## [1] 3
     ## 
     ## $n.pop
-    ## [1] 5
+    ## [1] 4
     ## 
     ## $assign.prop
     ## [1] 0.996139
     ## 
     ## $assign.per.pop
-    ##         1         2         3         4         5 
-    ## 1.0000000 1.0000000 1.0000000 0.9714286 1.0000000 
+    ##         1         2         3         4 
+    ## 1.0000000 1.0000000 0.9714286 1.0000000 
     ## 
     ## $prior.grp.size
     ## 
-    ##   1   2   3   4   5 
-    ##   6 117  96  35   5 
+    ##   1   2   3   4 
+    ##   2 120  35 102 
     ## 
     ## $post.grp.size
     ## 
-    ##   1   2   3   4   5 
-    ##   6 117  97  34   5
+    ##   1   2   3   4 
+    ##   2 120  34 103
 
 Average assignment proportion, `assign.prop`, is quite high, 0.996.
 Looking closely at the assignment values;
@@ -969,12 +970,12 @@ Looking closely at the assignment values;
 ``` r
 round(dapc1_pat$posterior,3) -> assgn_values
 
-kableExtra::kable(assgn_values, caption = "Proportions of successful assgnemnt of individuals")
+kableExtra::kable(assgn_values, caption = "Proportions of successful assignment of individuals")
 ```
 
 <table>
 <caption>
-Proportions of successful assgnemnt of individuals
+Proportions of successful assignment of individuals
 </caption>
 <thead>
 <tr>
@@ -992,9 +993,6 @@ Proportions of successful assgnemnt of individuals
 <th style="text-align:right;">
 4
 </th>
-<th style="text-align:right;">
-5
-</th>
 </tr>
 </thead>
 <tbody>
@@ -1009,13 +1007,10 @@ WG6694108-DNA\_A01\_110kin
 0
 </td>
 <td style="text-align:right;">
-1.000
-</td>
-<td style="text-align:right;">
 0.000
 </td>
 <td style="text-align:right;">
-0
+1.000
 </td>
 </tr>
 <tr>
@@ -1029,13 +1024,10 @@ WG6694108-DNA\_A02\_105kin1
 0
 </td>
 <td style="text-align:right;">
-0.000
-</td>
-<td style="text-align:right;">
 1.000
 </td>
 <td style="text-align:right;">
-0
+0.000
 </td>
 </tr>
 <tr>
@@ -1049,13 +1041,10 @@ WG6694108-DNA\_A03\_55kin
 0
 </td>
 <td style="text-align:right;">
-1.000
-</td>
-<td style="text-align:right;">
 0.000
 </td>
 <td style="text-align:right;">
-0
+1.000
 </td>
 </tr>
 <tr>
@@ -1069,13 +1058,10 @@ WG6694108-DNA\_A04\_50kin
 0
 </td>
 <td style="text-align:right;">
-1.000
-</td>
-<td style="text-align:right;">
 0.000
 </td>
 <td style="text-align:right;">
-0
+1.000
 </td>
 </tr>
 <tr>
@@ -1089,13 +1075,10 @@ WG6694108-DNA\_A05\_104kin
 0
 </td>
 <td style="text-align:right;">
-1.000
-</td>
-<td style="text-align:right;">
 0.000
 </td>
 <td style="text-align:right;">
-0
+1.000
 </td>
 </tr>
 <tr>
@@ -1109,13 +1092,10 @@ WG6694108-DNA\_A06\_82kin
 0
 </td>
 <td style="text-align:right;">
-1.000
-</td>
-<td style="text-align:right;">
 0.000
 </td>
 <td style="text-align:right;">
-0
+1.000
 </td>
 </tr>
 <tr>
@@ -1129,13 +1109,10 @@ WG6694108-DNA\_A07\_75kin1
 0
 </td>
 <td style="text-align:right;">
-1.000
-</td>
-<td style="text-align:right;">
 0.000
 </td>
 <td style="text-align:right;">
-0
+1.000
 </td>
 </tr>
 <tr>
@@ -1149,13 +1126,10 @@ WG6694108-DNA\_A08\_110kin1
 0
 </td>
 <td style="text-align:right;">
-1.000
-</td>
-<td style="text-align:right;">
 0.000
 </td>
 <td style="text-align:right;">
-0
+1.000
 </td>
 </tr>
 <tr>
@@ -1169,13 +1143,10 @@ WG6694108-DNA\_A09\_77kin
 0
 </td>
 <td style="text-align:right;">
-1.000
-</td>
-<td style="text-align:right;">
 0.000
 </td>
 <td style="text-align:right;">
-0
+1.000
 </td>
 </tr>
 <tr>
@@ -1183,7 +1154,7 @@ WG6694108-DNA\_A09\_77kin
 WG6694108-DNA\_A10\_Zkin2
 </td>
 <td style="text-align:right;">
-1
+0
 </td>
 <td style="text-align:right;">
 0
@@ -1192,10 +1163,7 @@ WG6694108-DNA\_A10\_Zkin2
 0.000
 </td>
 <td style="text-align:right;">
-0.000
-</td>
-<td style="text-align:right;">
-0
+1.000
 </td>
 </tr>
 <tr>
@@ -1209,13 +1177,10 @@ WG6694108-DNA\_A11\_51kin2
 0
 </td>
 <td style="text-align:right;">
-1.000
-</td>
-<td style="text-align:right;">
 0.000
 </td>
 <td style="text-align:right;">
-0
+1.000
 </td>
 </tr>
 <tr>
@@ -1229,13 +1194,10 @@ WG6694108-DNA\_A12\_83kin1
 0
 </td>
 <td style="text-align:right;">
-0.000
-</td>
-<td style="text-align:right;">
 1.000
 </td>
 <td style="text-align:right;">
-0
+0.000
 </td>
 </tr>
 <tr>
@@ -1249,13 +1211,10 @@ WG6694108-DNA\_B01\_21kinX1
 0
 </td>
 <td style="text-align:right;">
-1.000
-</td>
-<td style="text-align:right;">
 0.000
 </td>
 <td style="text-align:right;">
-0
+1.000
 </td>
 </tr>
 <tr>
@@ -1269,13 +1228,10 @@ WG6694108-DNA\_B02\_21kin1
 0
 </td>
 <td style="text-align:right;">
-1.000
-</td>
-<td style="text-align:right;">
 0.000
 </td>
 <td style="text-align:right;">
-0
+1.000
 </td>
 </tr>
 <tr>
@@ -1289,13 +1245,10 @@ WG6694108-DNA\_B03\_78kin1
 0
 </td>
 <td style="text-align:right;">
-1.000
-</td>
-<td style="text-align:right;">
 0.000
 </td>
 <td style="text-align:right;">
-0
+1.000
 </td>
 </tr>
 <tr>
@@ -1309,13 +1262,10 @@ WG6694108-DNA\_B04\_101kin1
 0
 </td>
 <td style="text-align:right;">
-1.000
-</td>
-<td style="text-align:right;">
 0.000
 </td>
 <td style="text-align:right;">
-0
+1.000
 </td>
 </tr>
 <tr>
@@ -1329,13 +1279,10 @@ WG6694108-DNA\_B05\_75kinX1
 0
 </td>
 <td style="text-align:right;">
-1.000
-</td>
-<td style="text-align:right;">
 0.000
 </td>
 <td style="text-align:right;">
-0
+1.000
 </td>
 </tr>
 <tr>
@@ -1349,13 +1296,10 @@ WG6694108-DNA\_B06\_30kin2
 0
 </td>
 <td style="text-align:right;">
-1.000
-</td>
-<td style="text-align:right;">
 0.000
 </td>
 <td style="text-align:right;">
-0
+1.000
 </td>
 </tr>
 <tr>
@@ -1369,13 +1313,10 @@ WG6694108-DNA\_B07\_80kin2
 0
 </td>
 <td style="text-align:right;">
-0.975
+0.033
 </td>
 <td style="text-align:right;">
-0.025
-</td>
-<td style="text-align:right;">
-0
+0.967
 </td>
 </tr>
 <tr>
@@ -1389,13 +1330,10 @@ WG6694108-DNA\_B08\_31kin2
 0
 </td>
 <td style="text-align:right;">
-1.000
-</td>
-<td style="text-align:right;">
 0.000
 </td>
 <td style="text-align:right;">
-0
+1.000
 </td>
 </tr>
 <tr>
@@ -1409,13 +1347,10 @@ WG6694108-DNA\_B09\_12kin2
 0
 </td>
 <td style="text-align:right;">
-1.000
-</td>
-<td style="text-align:right;">
 0.000
 </td>
 <td style="text-align:right;">
-0
+1.000
 </td>
 </tr>
 <tr>
@@ -1429,13 +1364,10 @@ WG6694108-DNA\_B11\_16kin2
 0
 </td>
 <td style="text-align:right;">
-1.000
-</td>
-<td style="text-align:right;">
 0.000
 </td>
 <td style="text-align:right;">
-0
+1.000
 </td>
 </tr>
 <tr>
@@ -1449,13 +1381,10 @@ WG6694108-DNA\_B12\_4kin1
 0
 </td>
 <td style="text-align:right;">
-1.000
-</td>
-<td style="text-align:right;">
 0.000
 </td>
 <td style="text-align:right;">
-0
+1.000
 </td>
 </tr>
 <tr>
@@ -1469,13 +1398,10 @@ WG6694108-DNA\_C01\_XYkin1
 0
 </td>
 <td style="text-align:right;">
-1.000
-</td>
-<td style="text-align:right;">
 0.000
 </td>
 <td style="text-align:right;">
-0
+1.000
 </td>
 </tr>
 <tr>
@@ -1489,13 +1415,10 @@ WG6694108-DNA\_C02\_36kin2
 0
 </td>
 <td style="text-align:right;">
-1.000
-</td>
-<td style="text-align:right;">
 0.000
 </td>
 <td style="text-align:right;">
-0
+1.000
 </td>
 </tr>
 <tr>
@@ -1509,13 +1432,10 @@ WG6694108-DNA\_C03\_29kin2
 0
 </td>
 <td style="text-align:right;">
-1.000
-</td>
-<td style="text-align:right;">
 0.000
 </td>
 <td style="text-align:right;">
-0
+1.000
 </td>
 </tr>
 <tr>
@@ -1529,13 +1449,10 @@ WG6694108-DNA\_C04\_52kin1
 0
 </td>
 <td style="text-align:right;">
-1.000
-</td>
-<td style="text-align:right;">
 0.000
 </td>
 <td style="text-align:right;">
-0
+1.000
 </td>
 </tr>
 <tr>
@@ -1549,13 +1466,10 @@ WG6694108-DNA\_C05\_58kin
 0
 </td>
 <td style="text-align:right;">
-1.000
-</td>
-<td style="text-align:right;">
 0.000
 </td>
 <td style="text-align:right;">
-0
+1.000
 </td>
 </tr>
 <tr>
@@ -1569,13 +1483,10 @@ WG6694108-DNA\_C06\_9kin2
 0
 </td>
 <td style="text-align:right;">
-1.000
-</td>
-<td style="text-align:right;">
 0.000
 </td>
 <td style="text-align:right;">
-0
+1.000
 </td>
 </tr>
 <tr>
@@ -1589,13 +1500,10 @@ WG6694108-DNA\_C08\_61kin1
 0
 </td>
 <td style="text-align:right;">
-1.000
-</td>
-<td style="text-align:right;">
 0.000
 </td>
 <td style="text-align:right;">
-0
+1.000
 </td>
 </tr>
 <tr>
@@ -1609,13 +1517,10 @@ WG6694108-DNA\_C10\_33kin1
 0
 </td>
 <td style="text-align:right;">
-0.000
-</td>
-<td style="text-align:right;">
 1.000
 </td>
 <td style="text-align:right;">
-0
+0.000
 </td>
 </tr>
 <tr>
@@ -1629,13 +1534,10 @@ WG6694108-DNA\_C12\_63kin1
 0
 </td>
 <td style="text-align:right;">
-1.000
-</td>
-<td style="text-align:right;">
 0.000
 </td>
 <td style="text-align:right;">
-0
+1.000
 </td>
 </tr>
 <tr>
@@ -1649,13 +1551,10 @@ WG6694108-DNA\_D01\_104kin2
 0
 </td>
 <td style="text-align:right;">
-1.000
-</td>
-<td style="text-align:right;">
 0.000
 </td>
 <td style="text-align:right;">
-0
+1.000
 </td>
 </tr>
 <tr>
@@ -1669,13 +1568,10 @@ WG6694108-DNA\_D02\_19kin2
 0
 </td>
 <td style="text-align:right;">
-1.000
-</td>
-<td style="text-align:right;">
 0.000
 </td>
 <td style="text-align:right;">
-0
+1.000
 </td>
 </tr>
 <tr>
@@ -1689,13 +1585,10 @@ WG6694108-DNA\_D03\_13kin25-1
 0
 </td>
 <td style="text-align:right;">
-1.000
-</td>
-<td style="text-align:right;">
 0.000
 </td>
 <td style="text-align:right;">
-0
+1.000
 </td>
 </tr>
 <tr>
@@ -1709,13 +1602,10 @@ WG6694108-DNA\_D04\_41kin1
 0
 </td>
 <td style="text-align:right;">
-1.000
-</td>
-<td style="text-align:right;">
 0.000
 </td>
 <td style="text-align:right;">
-0
+1.000
 </td>
 </tr>
 <tr>
@@ -1729,13 +1619,10 @@ WG6694108-DNA\_D05\_30kinX1
 0
 </td>
 <td style="text-align:right;">
-1.000
-</td>
-<td style="text-align:right;">
 0.000
 </td>
 <td style="text-align:right;">
-0
+1.000
 </td>
 </tr>
 <tr>
@@ -1749,13 +1636,10 @@ WG6694108-DNA\_D06\_16kin1
 0
 </td>
 <td style="text-align:right;">
-1.000
-</td>
-<td style="text-align:right;">
 0.000
 </td>
 <td style="text-align:right;">
-0
+1.000
 </td>
 </tr>
 <tr>
@@ -1763,7 +1647,7 @@ WG6694108-DNA\_D06\_16kin1
 WG6694108-DNA\_D07\_ZkinX1
 </td>
 <td style="text-align:right;">
-1
+0
 </td>
 <td style="text-align:right;">
 0
@@ -1772,10 +1656,7 @@ WG6694108-DNA\_D07\_ZkinX1
 0.000
 </td>
 <td style="text-align:right;">
-0.000
-</td>
-<td style="text-align:right;">
-0
+1.000
 </td>
 </tr>
 <tr>
@@ -1789,13 +1670,10 @@ WG6694108-DNA\_D08\_50kinZ
 0
 </td>
 <td style="text-align:right;">
-1.000
-</td>
-<td style="text-align:right;">
 0.000
 </td>
 <td style="text-align:right;">
-0
+1.000
 </td>
 </tr>
 <tr>
@@ -1809,13 +1687,10 @@ WG6694108-DNA\_D09\_75kin
 0
 </td>
 <td style="text-align:right;">
-1.000
-</td>
-<td style="text-align:right;">
 0.000
 </td>
 <td style="text-align:right;">
-0
+1.000
 </td>
 </tr>
 <tr>
@@ -1829,13 +1704,10 @@ WG6694108-DNA\_D12\_50kin1
 0
 </td>
 <td style="text-align:right;">
-1.000
-</td>
-<td style="text-align:right;">
 0.000
 </td>
 <td style="text-align:right;">
-0
+1.000
 </td>
 </tr>
 <tr>
@@ -1849,13 +1721,10 @@ WG6694108-DNA\_E01\_81kin
 0
 </td>
 <td style="text-align:right;">
-1.000
-</td>
-<td style="text-align:right;">
 0.000
 </td>
 <td style="text-align:right;">
-0
+1.000
 </td>
 </tr>
 <tr>
@@ -1869,13 +1738,10 @@ WG6694108-DNA\_E02\_28kin\_dil
 0
 </td>
 <td style="text-align:right;">
-1.000
-</td>
-<td style="text-align:right;">
 0.000
 </td>
 <td style="text-align:right;">
-0
+1.000
 </td>
 </tr>
 <tr>
@@ -1889,13 +1755,10 @@ WG6694108-DNA\_E03\_110kin2
 0
 </td>
 <td style="text-align:right;">
-1.000
-</td>
-<td style="text-align:right;">
 0.000
 </td>
 <td style="text-align:right;">
-0
+1.000
 </td>
 </tr>
 <tr>
@@ -1909,13 +1772,10 @@ WG6694108-DNA\_E04\_31Xkin1
 0
 </td>
 <td style="text-align:right;">
-1.000
-</td>
-<td style="text-align:right;">
 0.000
 </td>
 <td style="text-align:right;">
-0
+1.000
 </td>
 </tr>
 <tr>
@@ -1929,13 +1789,10 @@ WG6694108-DNA\_E06\_25kin1
 0
 </td>
 <td style="text-align:right;">
-1.000
-</td>
-<td style="text-align:right;">
 0.000
 </td>
 <td style="text-align:right;">
-0
+1.000
 </td>
 </tr>
 <tr>
@@ -1943,7 +1800,7 @@ WG6694108-DNA\_E06\_25kin1
 WG6694108-DNA\_E07\_Z-Xkin1
 </td>
 <td style="text-align:right;">
-1
+0
 </td>
 <td style="text-align:right;">
 0
@@ -1952,10 +1809,7 @@ WG6694108-DNA\_E07\_Z-Xkin1
 0.000
 </td>
 <td style="text-align:right;">
-0.000
-</td>
-<td style="text-align:right;">
-0
+1.000
 </td>
 </tr>
 <tr>
@@ -1969,13 +1823,10 @@ WG6694108-DNA\_E10\_31kinX1
 0
 </td>
 <td style="text-align:right;">
-1.000
-</td>
-<td style="text-align:right;">
 0.000
 </td>
 <td style="text-align:right;">
-0
+1.000
 </td>
 </tr>
 <tr>
@@ -1989,13 +1840,10 @@ WG6694108-DNA\_E11\_72kin2
 0
 </td>
 <td style="text-align:right;">
-1.000
-</td>
-<td style="text-align:right;">
 0.000
 </td>
 <td style="text-align:right;">
-0
+1.000
 </td>
 </tr>
 <tr>
@@ -2009,13 +1857,10 @@ WG6694108-DNA\_E12\_37kin1
 0
 </td>
 <td style="text-align:right;">
-1.000
-</td>
-<td style="text-align:right;">
 0.000
 </td>
 <td style="text-align:right;">
-0
+1.000
 </td>
 </tr>
 <tr>
@@ -2029,13 +1874,10 @@ WG6694108-DNA\_F01\_25kin1x
 0
 </td>
 <td style="text-align:right;">
-1.000
-</td>
-<td style="text-align:right;">
 0.000
 </td>
 <td style="text-align:right;">
-0
+1.000
 </td>
 </tr>
 <tr>
@@ -2049,13 +1891,10 @@ WG6694108-DNA\_F02\_13kin26-1
 0
 </td>
 <td style="text-align:right;">
-1.000
-</td>
-<td style="text-align:right;">
 0.000
 </td>
 <td style="text-align:right;">
-0
+1.000
 </td>
 </tr>
 <tr>
@@ -2069,13 +1908,10 @@ WG6694108-DNA\_F03\_72kin1
 0
 </td>
 <td style="text-align:right;">
-1.000
-</td>
-<td style="text-align:right;">
 0.000
 </td>
 <td style="text-align:right;">
-0
+1.000
 </td>
 </tr>
 <tr>
@@ -2089,13 +1925,10 @@ WG6694108-DNA\_F04\_82kin1
 0
 </td>
 <td style="text-align:right;">
-1.000
-</td>
-<td style="text-align:right;">
 0.000
 </td>
 <td style="text-align:right;">
-0
+1.000
 </td>
 </tr>
 <tr>
@@ -2109,13 +1942,10 @@ WG6694108-DNA\_F05\_102kin
 0
 </td>
 <td style="text-align:right;">
-0.049
+0.989
 </td>
 <td style="text-align:right;">
-0.951
-</td>
-<td style="text-align:right;">
-0
+0.011
 </td>
 </tr>
 <tr>
@@ -2134,9 +1964,6 @@ WG6694108-DNA\_F06\_1kin
 <td style="text-align:right;">
 0.000
 </td>
-<td style="text-align:right;">
-0
-</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -2149,13 +1976,10 @@ WG6694108-DNA\_F07\_46kin1
 0
 </td>
 <td style="text-align:right;">
-1.000
-</td>
-<td style="text-align:right;">
 0.000
 </td>
 <td style="text-align:right;">
-0
+1.000
 </td>
 </tr>
 <tr>
@@ -2169,13 +1993,10 @@ WG6694108-DNA\_F08\_96kin1
 0
 </td>
 <td style="text-align:right;">
-1.000
-</td>
-<td style="text-align:right;">
 0.000
 </td>
 <td style="text-align:right;">
-0
+1.000
 </td>
 </tr>
 <tr>
@@ -2189,13 +2010,10 @@ WG6694108-DNA\_F09\_21kinP
 0
 </td>
 <td style="text-align:right;">
-1.000
-</td>
-<td style="text-align:right;">
 0.000
 </td>
 <td style="text-align:right;">
-0
+1.000
 </td>
 </tr>
 <tr>
@@ -2209,13 +2027,10 @@ WG6694108-DNA\_F10\_81kin1
 0
 </td>
 <td style="text-align:right;">
-1.000
-</td>
-<td style="text-align:right;">
 0.000
 </td>
 <td style="text-align:right;">
-0
+1.000
 </td>
 </tr>
 <tr>
@@ -2229,13 +2044,10 @@ WG6694108-DNA\_F11\_99kin1
 0
 </td>
 <td style="text-align:right;">
-1.000
-</td>
-<td style="text-align:right;">
 0.000
 </td>
 <td style="text-align:right;">
-0
+1.000
 </td>
 </tr>
 <tr>
@@ -2249,13 +2061,10 @@ WG6694108-DNA\_F12\_30kin1Z
 0
 </td>
 <td style="text-align:right;">
-1.000
-</td>
-<td style="text-align:right;">
 0.000
 </td>
 <td style="text-align:right;">
-0
+1.000
 </td>
 </tr>
 <tr>
@@ -2269,13 +2078,10 @@ WG6694108-DNA\_G01\_57kin
 0
 </td>
 <td style="text-align:right;">
-1.000
-</td>
-<td style="text-align:right;">
 0.000
 </td>
 <td style="text-align:right;">
-0
+1.000
 </td>
 </tr>
 <tr>
@@ -2289,13 +2095,10 @@ WG6694108-DNA\_G02\_51kin1
 0
 </td>
 <td style="text-align:right;">
-1.000
-</td>
-<td style="text-align:right;">
 0.000
 </td>
 <td style="text-align:right;">
-0
+1.000
 </td>
 </tr>
 <tr>
@@ -2309,13 +2112,10 @@ WG6694108-DNA\_G03\_53kin1
 0
 </td>
 <td style="text-align:right;">
-1.000
-</td>
-<td style="text-align:right;">
 0.000
 </td>
 <td style="text-align:right;">
-0
+1.000
 </td>
 </tr>
 <tr>
@@ -2329,13 +2129,10 @@ WG6694108-DNA\_G04\_43kin1a
 0
 </td>
 <td style="text-align:right;">
-1.000
-</td>
-<td style="text-align:right;">
 0.000
 </td>
 <td style="text-align:right;">
-0
+1.000
 </td>
 </tr>
 <tr>
@@ -2349,13 +2146,10 @@ WG6694108-DNA\_G05\_100kin1A
 0
 </td>
 <td style="text-align:right;">
-1.000
-</td>
-<td style="text-align:right;">
 0.000
 </td>
 <td style="text-align:right;">
-0
+1.000
 </td>
 </tr>
 <tr>
@@ -2369,13 +2163,10 @@ WG6694108-DNA\_G06\_18kin
 0
 </td>
 <td style="text-align:right;">
-1.000
-</td>
-<td style="text-align:right;">
 0.000
 </td>
 <td style="text-align:right;">
-0
+1.000
 </td>
 </tr>
 <tr>
@@ -2389,13 +2180,10 @@ WG6694108-DNA\_G07\_39kin
 0
 </td>
 <td style="text-align:right;">
-1.000
-</td>
-<td style="text-align:right;">
 0.000
 </td>
 <td style="text-align:right;">
-0
+1.000
 </td>
 </tr>
 <tr>
@@ -2409,13 +2197,10 @@ WG6694108-DNA\_G08\_98kin
 0
 </td>
 <td style="text-align:right;">
-1.000
-</td>
-<td style="text-align:right;">
 0.000
 </td>
 <td style="text-align:right;">
-0
+1.000
 </td>
 </tr>
 <tr>
@@ -2429,13 +2214,10 @@ WG6694108-DNA\_G09\_106kin
 0
 </td>
 <td style="text-align:right;">
-1.000
-</td>
-<td style="text-align:right;">
 0.000
 </td>
 <td style="text-align:right;">
-0
+1.000
 </td>
 </tr>
 <tr>
@@ -2449,13 +2231,10 @@ WG6694108-DNA\_G11\_100kin
 0
 </td>
 <td style="text-align:right;">
-1.000
-</td>
-<td style="text-align:right;">
 0.000
 </td>
 <td style="text-align:right;">
-0
+1.000
 </td>
 </tr>
 <tr>
@@ -2469,13 +2248,10 @@ WG6694108-DNA\_G12\_59kin
 0
 </td>
 <td style="text-align:right;">
-1.000
-</td>
-<td style="text-align:right;">
 0.000
 </td>
 <td style="text-align:right;">
-0
+1.000
 </td>
 </tr>
 <tr>
@@ -2489,13 +2265,10 @@ WG6694108-DNA\_H01\_49kinB
 0
 </td>
 <td style="text-align:right;">
-1.000
-</td>
-<td style="text-align:right;">
 0.000
 </td>
 <td style="text-align:right;">
-0
+1.000
 </td>
 </tr>
 <tr>
@@ -2509,13 +2282,10 @@ WG6694108-DNA\_H02\_30kinZ
 0
 </td>
 <td style="text-align:right;">
-1.000
-</td>
-<td style="text-align:right;">
 0.000
 </td>
 <td style="text-align:right;">
-0
+1.000
 </td>
 </tr>
 <tr>
@@ -2529,13 +2299,10 @@ WG6694108-DNA\_H03\_30kin
 0
 </td>
 <td style="text-align:right;">
-1.000
-</td>
-<td style="text-align:right;">
 0.000
 </td>
 <td style="text-align:right;">
-0
+1.000
 </td>
 </tr>
 <tr>
@@ -2549,13 +2316,10 @@ WG6694108-DNA\_H04\_71kin
 0
 </td>
 <td style="text-align:right;">
-1.000
-</td>
-<td style="text-align:right;">
 0.000
 </td>
 <td style="text-align:right;">
-0
+1.000
 </td>
 </tr>
 <tr>
@@ -2569,13 +2333,10 @@ WG6694108-DNA\_H05\_67kin
 0
 </td>
 <td style="text-align:right;">
-1.000
-</td>
-<td style="text-align:right;">
 0.000
 </td>
 <td style="text-align:right;">
-0
+1.000
 </td>
 </tr>
 <tr>
@@ -2589,13 +2350,10 @@ WG6694108-DNA\_H07\_70kin
 0
 </td>
 <td style="text-align:right;">
-1.000
-</td>
-<td style="text-align:right;">
 0.000
 </td>
 <td style="text-align:right;">
-0
+1.000
 </td>
 </tr>
 <tr>
@@ -2609,13 +2367,10 @@ WG6694108-DNA\_H08\_62kin
 0
 </td>
 <td style="text-align:right;">
-1.000
-</td>
-<td style="text-align:right;">
 0.000
 </td>
 <td style="text-align:right;">
-0
+1.000
 </td>
 </tr>
 <tr>
@@ -2634,9 +2389,6 @@ WG6694108-DNA\_H09\_1kinZ
 <td style="text-align:right;">
 0.000
 </td>
-<td style="text-align:right;">
-0
-</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -2649,13 +2401,10 @@ WG6694108-DNA\_H10\_15kinZ
 0
 </td>
 <td style="text-align:right;">
-1.000
-</td>
-<td style="text-align:right;">
 0.000
 </td>
 <td style="text-align:right;">
-0
+1.000
 </td>
 </tr>
 <tr>
@@ -2674,9 +2423,6 @@ WG6694108-DNA\_H11\_3kin
 <td style="text-align:right;">
 0.000
 </td>
-<td style="text-align:right;">
-0
-</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -2689,13 +2435,10 @@ WG6694108-DNA\_H12\_47kin
 0
 </td>
 <td style="text-align:right;">
-1.000
-</td>
-<td style="text-align:right;">
 0.000
 </td>
 <td style="text-align:right;">
-0
+1.000
 </td>
 </tr>
 <tr>
@@ -2709,13 +2452,10 @@ WG6694109-DNA\_A02\_53kin2
 0
 </td>
 <td style="text-align:right;">
-1.000
-</td>
-<td style="text-align:right;">
 0.000
 </td>
 <td style="text-align:right;">
-0
+1.000
 </td>
 </tr>
 <tr>
@@ -2729,13 +2469,10 @@ WG6694109-DNA\_A03\_103kin
 0
 </td>
 <td style="text-align:right;">
-1.000
-</td>
-<td style="text-align:right;">
 0.000
 </td>
 <td style="text-align:right;">
-0
+1.000
 </td>
 </tr>
 <tr>
@@ -2749,13 +2486,10 @@ WG6694109-DNA\_A04\_48kin1
 0
 </td>
 <td style="text-align:right;">
-1.000
-</td>
-<td style="text-align:right;">
 0.000
 </td>
 <td style="text-align:right;">
-0
+1.000
 </td>
 </tr>
 <tr>
@@ -2769,13 +2503,10 @@ WG6694109-DNA\_A05\_29kin1
 0
 </td>
 <td style="text-align:right;">
-1.000
-</td>
-<td style="text-align:right;">
 0.000
 </td>
 <td style="text-align:right;">
-0
+1.000
 </td>
 </tr>
 <tr>
@@ -2789,13 +2520,10 @@ WG6694109-DNA\_A06\_87kin1
 0
 </td>
 <td style="text-align:right;">
-1.000
-</td>
-<td style="text-align:right;">
 0.000
 </td>
 <td style="text-align:right;">
-0
+1.000
 </td>
 </tr>
 <tr>
@@ -2809,13 +2537,10 @@ WG6694109-DNA\_A07\_10kin
 0
 </td>
 <td style="text-align:right;">
-1.000
-</td>
-<td style="text-align:right;">
 0.000
 </td>
 <td style="text-align:right;">
-0
+1.000
 </td>
 </tr>
 <tr>
@@ -2829,13 +2554,10 @@ WG6694109-DNA\_A09\_38kin
 0
 </td>
 <td style="text-align:right;">
-1.000
-</td>
-<td style="text-align:right;">
 0.000
 </td>
 <td style="text-align:right;">
-0
+1.000
 </td>
 </tr>
 <tr>
@@ -2849,13 +2571,10 @@ WG6694109-DNA\_A10\_9kin
 0
 </td>
 <td style="text-align:right;">
-1.000
-</td>
-<td style="text-align:right;">
 0.000
 </td>
 <td style="text-align:right;">
-0
+1.000
 </td>
 </tr>
 <tr>
@@ -2869,13 +2588,10 @@ WG6694109-DNA\_A11\_Pkin
 0
 </td>
 <td style="text-align:right;">
-1.000
-</td>
-<td style="text-align:right;">
 0.000
 </td>
 <td style="text-align:right;">
-0
+1.000
 </td>
 </tr>
 <tr>
@@ -2889,13 +2605,10 @@ WG6694109-DNA\_B02\_61kin2
 0
 </td>
 <td style="text-align:right;">
-1.000
-</td>
-<td style="text-align:right;">
 0.000
 </td>
 <td style="text-align:right;">
-0
+1.000
 </td>
 </tr>
 <tr>
@@ -2903,7 +2616,7 @@ WG6694109-DNA\_B02\_61kin2
 WG6694109-DNA\_B03\_Zkin1
 </td>
 <td style="text-align:right;">
-1
+0
 </td>
 <td style="text-align:right;">
 0
@@ -2912,10 +2625,7 @@ WG6694109-DNA\_B03\_Zkin1
 0.000
 </td>
 <td style="text-align:right;">
-0.000
-</td>
-<td style="text-align:right;">
-0
+1.000
 </td>
 </tr>
 <tr>
@@ -2929,13 +2639,10 @@ WG6694109-DNA\_B04\_kinW
 0
 </td>
 <td style="text-align:right;">
-0.000
-</td>
-<td style="text-align:right;">
 1.000
 </td>
 <td style="text-align:right;">
-0
+0.000
 </td>
 </tr>
 <tr>
@@ -2949,13 +2656,10 @@ WG6694109-DNA\_B05\_kinZ1
 0
 </td>
 <td style="text-align:right;">
-1.000
-</td>
-<td style="text-align:right;">
 0.000
 </td>
 <td style="text-align:right;">
-0
+1.000
 </td>
 </tr>
 <tr>
@@ -2969,13 +2673,10 @@ WG6694109-DNA\_B06\_23kin1
 0
 </td>
 <td style="text-align:right;">
-1.000
-</td>
-<td style="text-align:right;">
 0.000
 </td>
 <td style="text-align:right;">
-0
+1.000
 </td>
 </tr>
 <tr>
@@ -2994,9 +2695,6 @@ WG6694109-DNA\_B07\_40marq
 <td style="text-align:right;">
 0.000
 </td>
-<td style="text-align:right;">
-0
-</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -3013,9 +2711,6 @@ WG6694109-DNA\_B09\_60styl
 </td>
 <td style="text-align:right;">
 0.000
-</td>
-<td style="text-align:right;">
-0
 </td>
 </tr>
 <tr>
@@ -3034,9 +2729,6 @@ WG6694109-DNA\_B10\_58styl
 <td style="text-align:right;">
 0.000
 </td>
-<td style="text-align:right;">
-0
-</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -3053,9 +2745,6 @@ WG6694109-DNA\_C01\_2mlm
 </td>
 <td style="text-align:right;">
 0.000
-</td>
-<td style="text-align:right;">
-0
 </td>
 </tr>
 <tr>
@@ -3074,9 +2763,6 @@ WG6694109-DNA\_C02\_4marq
 <td style="text-align:right;">
 0.000
 </td>
-<td style="text-align:right;">
-0
-</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -3094,9 +2780,6 @@ WG6694109-DNA\_C03\_57stylx
 <td style="text-align:right;">
 0.000
 </td>
-<td style="text-align:right;">
-0
-</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -3109,13 +2792,10 @@ WG6694109-DNA\_C04\_10styl
 0
 </td>
 <td style="text-align:right;">
-0.000
-</td>
-<td style="text-align:right;">
 1.000
 </td>
 <td style="text-align:right;">
-0
+0.000
 </td>
 </tr>
 <tr>
@@ -3134,9 +2814,6 @@ WG6694109-DNA\_C05\_42marqz
 <td style="text-align:right;">
 0.000
 </td>
-<td style="text-align:right;">
-0
-</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -3153,9 +2830,6 @@ WG6694109-DNA\_C06\_H2
 </td>
 <td style="text-align:right;">
 0.000
-</td>
-<td style="text-align:right;">
-0
 </td>
 </tr>
 <tr>
@@ -3174,9 +2848,6 @@ WG6694109-DNA\_C07\_14BHG
 <td style="text-align:right;">
 0.000
 </td>
-<td style="text-align:right;">
-0
-</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -3193,9 +2864,6 @@ WG6694109-DNA\_C09\_59styl2
 </td>
 <td style="text-align:right;">
 0.000
-</td>
-<td style="text-align:right;">
-0
 </td>
 </tr>
 <tr>
@@ -3214,9 +2882,6 @@ WG6694109-DNA\_C10\_56styl1
 <td style="text-align:right;">
 0.000
 </td>
-<td style="text-align:right;">
-0
-</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -3233,9 +2898,6 @@ WG6694109-DNA\_C11\_C21
 </td>
 <td style="text-align:right;">
 0.000
-</td>
-<td style="text-align:right;">
-0
 </td>
 </tr>
 <tr>
@@ -3254,9 +2916,6 @@ WG6694109-DNA\_C12\_E11
 <td style="text-align:right;">
 0.000
 </td>
-<td style="text-align:right;">
-0
-</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -3273,9 +2932,6 @@ WG6694109-DNA\_D01\_K22A
 </td>
 <td style="text-align:right;">
 0.000
-</td>
-<td style="text-align:right;">
-0
 </td>
 </tr>
 <tr>
@@ -3294,9 +2950,6 @@ WG6694109-DNA\_D02\_E21
 <td style="text-align:right;">
 0.000
 </td>
-<td style="text-align:right;">
-0
-</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -3313,9 +2966,6 @@ WG6694109-DNA\_D03\_K3
 </td>
 <td style="text-align:right;">
 0.000
-</td>
-<td style="text-align:right;">
-0
 </td>
 </tr>
 <tr>
@@ -3334,9 +2984,6 @@ WG6694109-DNA\_D05\_23Bar1
 <td style="text-align:right;">
 0.000
 </td>
-<td style="text-align:right;">
-0
-</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -3353,9 +3000,6 @@ WG6694109-DNA\_D07\_22Bar2
 </td>
 <td style="text-align:right;">
 0.000
-</td>
-<td style="text-align:right;">
-0
 </td>
 </tr>
 <tr>
@@ -3374,9 +3018,6 @@ WG6694109-DNA\_D08\_L22
 <td style="text-align:right;">
 0.000
 </td>
-<td style="text-align:right;">
-0
-</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -3393,9 +3034,6 @@ WG6694109-DNA\_D09\_29marq1
 </td>
 <td style="text-align:right;">
 0.000
-</td>
-<td style="text-align:right;">
-0
 </td>
 </tr>
 <tr>
@@ -3414,9 +3052,6 @@ WG6694109-DNA\_D10\_6mlm2
 <td style="text-align:right;">
 0.000
 </td>
-<td style="text-align:right;">
-0
-</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -3433,9 +3068,6 @@ WG6694109-DNA\_D11\_4marq1
 </td>
 <td style="text-align:right;">
 0.000
-</td>
-<td style="text-align:right;">
-0
 </td>
 </tr>
 <tr>
@@ -3454,9 +3086,6 @@ WG6694109-DNA\_D12\_2mlm1
 <td style="text-align:right;">
 0.000
 </td>
-<td style="text-align:right;">
-0
-</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -3473,9 +3102,6 @@ WG6694109-DNA\_E01\_66styl1
 </td>
 <td style="text-align:right;">
 0.000
-</td>
-<td style="text-align:right;">
-0
 </td>
 </tr>
 <tr>
@@ -3494,9 +3120,6 @@ WG6694109-DNA\_E03\_14Bul2
 <td style="text-align:right;">
 0.000
 </td>
-<td style="text-align:right;">
-0
-</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -3513,9 +3136,6 @@ WG6694109-DNA\_E04\_49marq2
 </td>
 <td style="text-align:right;">
 0.000
-</td>
-<td style="text-align:right;">
-0
 </td>
 </tr>
 <tr>
@@ -3534,9 +3154,6 @@ WG6694109-DNA\_E05\_15lweba1
 <td style="text-align:right;">
 0.000
 </td>
-<td style="text-align:right;">
-0
-</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -3553,9 +3170,6 @@ WG6694109-DNA\_E06\_20marq2
 </td>
 <td style="text-align:right;">
 0.000
-</td>
-<td style="text-align:right;">
-0
 </td>
 </tr>
 <tr>
@@ -3574,9 +3188,6 @@ WG6694109-DNA\_E07\_42marq
 <td style="text-align:right;">
 0.000
 </td>
-<td style="text-align:right;">
-0
-</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -3593,9 +3204,6 @@ WG6694109-DNA\_E08\_E3
 </td>
 <td style="text-align:right;">
 0.000
-</td>
-<td style="text-align:right;">
-0
 </td>
 </tr>
 <tr>
@@ -3614,9 +3222,6 @@ WG6694109-DNA\_E09\_63styl2
 <td style="text-align:right;">
 0.000
 </td>
-<td style="text-align:right;">
-0
-</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -3633,9 +3238,6 @@ WG6694109-DNA\_E10\_17marq1
 </td>
 <td style="text-align:right;">
 0.000
-</td>
-<td style="text-align:right;">
-0
 </td>
 </tr>
 <tr>
@@ -3654,9 +3256,6 @@ WG6694109-DNA\_E12\_16marqB2
 <td style="text-align:right;">
 0.000
 </td>
-<td style="text-align:right;">
-0
-</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -3673,9 +3272,6 @@ WG6694109-DNA\_F01\_15BHG1
 </td>
 <td style="text-align:right;">
 0.000
-</td>
-<td style="text-align:right;">
-0
 </td>
 </tr>
 <tr>
@@ -3694,9 +3290,6 @@ WG6694109-DNA\_F02\_62styl1
 <td style="text-align:right;">
 0.000
 </td>
-<td style="text-align:right;">
-0
-</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -3713,9 +3306,6 @@ WG6694109-DNA\_F03\_48marq1
 </td>
 <td style="text-align:right;">
 0.000
-</td>
-<td style="text-align:right;">
-0
 </td>
 </tr>
 <tr>
@@ -3734,9 +3324,6 @@ WG6694109-DNA\_F04\_50marq1
 <td style="text-align:right;">
 0.000
 </td>
-<td style="text-align:right;">
-0
-</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -3753,9 +3340,6 @@ WG6694109-DNA\_F05\_M2
 </td>
 <td style="text-align:right;">
 0.000
-</td>
-<td style="text-align:right;">
-0
 </td>
 </tr>
 <tr>
@@ -3774,9 +3358,6 @@ WG6694109-DNA\_F06\_J1
 <td style="text-align:right;">
 0.000
 </td>
-<td style="text-align:right;">
-0
-</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -3793,9 +3374,6 @@ WG6694109-DNA\_F07\_21marq
 </td>
 <td style="text-align:right;">
 0.000
-</td>
-<td style="text-align:right;">
-0
 </td>
 </tr>
 <tr>
@@ -3814,9 +3392,6 @@ WG6694109-DNA\_F08\_31marq2
 <td style="text-align:right;">
 0.000
 </td>
-<td style="text-align:right;">
-0
-</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -3833,9 +3408,6 @@ WG6694109-DNA\_F09\_30marq2
 </td>
 <td style="text-align:right;">
 0.000
-</td>
-<td style="text-align:right;">
-0
 </td>
 </tr>
 <tr>
@@ -3854,9 +3426,6 @@ WG6694109-DNA\_F10\_4marq2
 <td style="text-align:right;">
 0.000
 </td>
-<td style="text-align:right;">
-0
-</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -3873,9 +3442,6 @@ WG6694109-DNA\_F11\_26marq2
 </td>
 <td style="text-align:right;">
 0.000
-</td>
-<td style="text-align:right;">
-0
 </td>
 </tr>
 <tr>
@@ -3894,9 +3460,6 @@ WG6694109-DNA\_F12\_24marq1
 <td style="text-align:right;">
 0.000
 </td>
-<td style="text-align:right;">
-0
-</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -3913,9 +3476,6 @@ WG6694109-DNA\_G02\_F3
 </td>
 <td style="text-align:right;">
 0.000
-</td>
-<td style="text-align:right;">
-0
 </td>
 </tr>
 <tr>
@@ -3934,9 +3494,6 @@ WG6694109-DNA\_G03\_39marq1
 <td style="text-align:right;">
 0.000
 </td>
-<td style="text-align:right;">
-0
-</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -3953,9 +3510,6 @@ WG6694109-DNA\_G04\_45marq
 </td>
 <td style="text-align:right;">
 0.000
-</td>
-<td style="text-align:right;">
-0
 </td>
 </tr>
 <tr>
@@ -3974,9 +3528,6 @@ WG6694109-DNA\_G05\_20marq1
 <td style="text-align:right;">
 0.000
 </td>
-<td style="text-align:right;">
-0
-</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -3993,9 +3544,6 @@ WG6694109-DNA\_G06\_23marq
 </td>
 <td style="text-align:right;">
 0.000
-</td>
-<td style="text-align:right;">
-0
 </td>
 </tr>
 <tr>
@@ -4014,9 +3562,6 @@ WG6694109-DNA\_G07\_N21
 <td style="text-align:right;">
 0.000
 </td>
-<td style="text-align:right;">
-0
-</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -4033,9 +3578,6 @@ WG6694109-DNA\_G08\_I31
 </td>
 <td style="text-align:right;">
 0.000
-</td>
-<td style="text-align:right;">
-0
 </td>
 </tr>
 <tr>
@@ -4054,9 +3596,6 @@ WG6694109-DNA\_G09\_G11
 <td style="text-align:right;">
 0.000
 </td>
-<td style="text-align:right;">
-0
-</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -4073,9 +3612,6 @@ WG6694109-DNA\_G10\_29marq
 </td>
 <td style="text-align:right;">
 0.000
-</td>
-<td style="text-align:right;">
-0
 </td>
 </tr>
 <tr>
@@ -4094,9 +3630,6 @@ WG6694109-DNA\_G11\_31marq1
 <td style="text-align:right;">
 0.000
 </td>
-<td style="text-align:right;">
-0
-</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -4113,9 +3646,6 @@ WG6694109-DNA\_H01\_38marq1
 </td>
 <td style="text-align:right;">
 0.000
-</td>
-<td style="text-align:right;">
-0
 </td>
 </tr>
 <tr>
@@ -4134,9 +3664,6 @@ WG6694109-DNA\_H02\_7mlm1
 <td style="text-align:right;">
 0.000
 </td>
-<td style="text-align:right;">
-0
-</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -4153,9 +3680,6 @@ WG6694109-DNA\_H03\_8mlm1
 </td>
 <td style="text-align:right;">
 0.000
-</td>
-<td style="text-align:right;">
-0
 </td>
 </tr>
 <tr>
@@ -4174,9 +3698,6 @@ WG6694109-DNA\_H04\_B11
 <td style="text-align:right;">
 0.000
 </td>
-<td style="text-align:right;">
-0
-</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -4193,9 +3714,6 @@ WG6694109-DNA\_H05\_B2
 </td>
 <td style="text-align:right;">
 0.000
-</td>
-<td style="text-align:right;">
-0
 </td>
 </tr>
 <tr>
@@ -4214,9 +3732,6 @@ WG6694109-DNA\_H06\_J12
 <td style="text-align:right;">
 0.000
 </td>
-<td style="text-align:right;">
-0
-</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -4233,9 +3748,6 @@ WG6694109-DNA\_H07\_1marq2
 </td>
 <td style="text-align:right;">
 0.000
-</td>
-<td style="text-align:right;">
-0
 </td>
 </tr>
 <tr>
@@ -4254,9 +3766,6 @@ WG6694109-DNA\_H08\_M11
 <td style="text-align:right;">
 0.000
 </td>
-<td style="text-align:right;">
-0
-</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -4273,9 +3782,6 @@ WG6694109-DNA\_H09\_8marq1
 </td>
 <td style="text-align:right;">
 0.000
-</td>
-<td style="text-align:right;">
-0
 </td>
 </tr>
 <tr>
@@ -4294,9 +3800,6 @@ WG6694109-DNA\_H10\_A21
 <td style="text-align:right;">
 0.000
 </td>
-<td style="text-align:right;">
-0
-</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -4313,9 +3816,6 @@ WG6694109-DNA\_H11\_I2
 </td>
 <td style="text-align:right;">
 0.000
-</td>
-<td style="text-align:right;">
-0
 </td>
 </tr>
 <tr>
@@ -4334,9 +3834,6 @@ WG6694109-DNA\_H12\_47marq1
 <td style="text-align:right;">
 0.000
 </td>
-<td style="text-align:right;">
-0
-</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -4353,9 +3850,6 @@ WG6694110-DNA\_A01\_55styl
 </td>
 <td style="text-align:right;">
 0.000
-</td>
-<td style="text-align:right;">
-0
 </td>
 </tr>
 <tr>
@@ -4374,9 +3868,6 @@ WG6694110-DNA\_A03\_46marq1
 <td style="text-align:right;">
 0.000
 </td>
-<td style="text-align:right;">
-0
-</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -4393,9 +3884,6 @@ WG6694110-DNA\_A04\_M31
 </td>
 <td style="text-align:right;">
 0.000
-</td>
-<td style="text-align:right;">
-0
 </td>
 </tr>
 <tr>
@@ -4414,9 +3902,6 @@ WG6694110-DNA\_A05\_26Bar1
 <td style="text-align:right;">
 0.000
 </td>
-<td style="text-align:right;">
-0
-</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -4433,9 +3918,6 @@ WG6694110-DNA\_A06\_40marq1
 </td>
 <td style="text-align:right;">
 0.000
-</td>
-<td style="text-align:right;">
-0
 </td>
 </tr>
 <tr>
@@ -4454,9 +3936,6 @@ WG6694110-DNA\_A07\_12marq
 <td style="text-align:right;">
 0.000
 </td>
-<td style="text-align:right;">
-0
-</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -4474,9 +3953,6 @@ WG6694110-DNA\_A08\_F2
 <td style="text-align:right;">
 0.000
 </td>
-<td style="text-align:right;">
-0
-</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -4489,13 +3965,10 @@ WG6694110-DNA\_A09\_8stylz
 0
 </td>
 <td style="text-align:right;">
-0.000
-</td>
-<td style="text-align:right;">
 1.000
 </td>
 <td style="text-align:right;">
-0
+0.000
 </td>
 </tr>
 <tr>
@@ -4506,16 +3979,13 @@ WG6694110-DNA\_A10\_D1Z
 0
 </td>
 <td style="text-align:right;">
-0
-</td>
-<td style="text-align:right;">
-0.000
-</td>
-<td style="text-align:right;">
-0.000
-</td>
-<td style="text-align:right;">
 1
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0.000
 </td>
 </tr>
 <tr>
@@ -4534,9 +4004,6 @@ WG6694110-DNA\_A11\_65stylz
 <td style="text-align:right;">
 0.000
 </td>
-<td style="text-align:right;">
-0
-</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -4553,9 +4020,6 @@ WG6694110-DNA\_A12\_18lweba2
 </td>
 <td style="text-align:right;">
 0.000
-</td>
-<td style="text-align:right;">
-0
 </td>
 </tr>
 <tr>
@@ -4574,9 +4038,6 @@ WG6694110-DNA\_B01\_29Bar2
 <td style="text-align:right;">
 0.000
 </td>
-<td style="text-align:right;">
-0
-</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -4593,9 +4054,6 @@ WG6694110-DNA\_B02\_B3
 </td>
 <td style="text-align:right;">
 0.000
-</td>
-<td style="text-align:right;">
-0
 </td>
 </tr>
 <tr>
@@ -4614,9 +4072,6 @@ WG6694110-DNA\_B03\_18marq
 <td style="text-align:right;">
 0.000
 </td>
-<td style="text-align:right;">
-0
-</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -4633,9 +4088,6 @@ WG6694110-DNA\_B04\_J31
 </td>
 <td style="text-align:right;">
 0.000
-</td>
-<td style="text-align:right;">
-0
 </td>
 </tr>
 <tr>
@@ -4654,9 +4106,6 @@ WG6694110-DNA\_B05\_A31
 <td style="text-align:right;">
 0.000
 </td>
-<td style="text-align:right;">
-0
-</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -4673,9 +4122,6 @@ WG6694110-DNA\_B06\_K2
 </td>
 <td style="text-align:right;">
 0.000
-</td>
-<td style="text-align:right;">
-0
 </td>
 </tr>
 <tr>
@@ -4694,9 +4140,6 @@ WG6694110-DNA\_B08\_4mlm
 <td style="text-align:right;">
 0.000
 </td>
-<td style="text-align:right;">
-0
-</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -4713,9 +4156,6 @@ WG6694110-DNA\_B10\_67stylz1
 </td>
 <td style="text-align:right;">
 0.000
-</td>
-<td style="text-align:right;">
-0
 </td>
 </tr>
 <tr>
@@ -4734,9 +4174,6 @@ WG6694110-DNA\_C01\_F3A1
 <td style="text-align:right;">
 0.000
 </td>
-<td style="text-align:right;">
-0
-</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -4753,9 +4190,6 @@ WG6694110-DNA\_C02\_A12
 </td>
 <td style="text-align:right;">
 0.000
-</td>
-<td style="text-align:right;">
-0
 </td>
 </tr>
 <tr>
@@ -4774,9 +4208,6 @@ WG6694110-DNA\_C04\_I1
 <td style="text-align:right;">
 0.000
 </td>
-<td style="text-align:right;">
-0
-</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -4793,9 +4224,6 @@ WG6694110-DNA\_C05\_1marq1
 </td>
 <td style="text-align:right;">
 0.000
-</td>
-<td style="text-align:right;">
-0
 </td>
 </tr>
 <tr>
@@ -4814,9 +4242,6 @@ WG6694110-DNA\_C06\_8mlm
 <td style="text-align:right;">
 0.000
 </td>
-<td style="text-align:right;">
-0
-</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -4826,16 +4251,13 @@ WG6694110-DNA\_C07\_D11
 0
 </td>
 <td style="text-align:right;">
-0
-</td>
-<td style="text-align:right;">
-0.000
-</td>
-<td style="text-align:right;">
-0.000
-</td>
-<td style="text-align:right;">
 1
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0.000
 </td>
 </tr>
 <tr>
@@ -4849,13 +4271,10 @@ WG6694110-DNA\_C08\_8styl
 0
 </td>
 <td style="text-align:right;">
-0.000
-</td>
-<td style="text-align:right;">
 1.000
 </td>
 <td style="text-align:right;">
-0
+0.000
 </td>
 </tr>
 <tr>
@@ -4874,9 +4293,6 @@ WG6694110-DNA\_C09\_37marq1
 <td style="text-align:right;">
 0.000
 </td>
-<td style="text-align:right;">
-0
-</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -4893,9 +4309,6 @@ WG6694110-DNA\_C10\_30marq
 </td>
 <td style="text-align:right;">
 0.000
-</td>
-<td style="text-align:right;">
-0
 </td>
 </tr>
 <tr>
@@ -4914,9 +4327,6 @@ WG6694110-DNA\_C11\_3mlm1
 <td style="text-align:right;">
 0.000
 </td>
-<td style="text-align:right;">
-0
-</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -4933,9 +4343,6 @@ WG6694110-DNA\_C12\_19marq2
 </td>
 <td style="text-align:right;">
 0.000
-</td>
-<td style="text-align:right;">
-0
 </td>
 </tr>
 <tr>
@@ -4954,9 +4361,6 @@ WG6694110-DNA\_D01\_24marq
 <td style="text-align:right;">
 0.000
 </td>
-<td style="text-align:right;">
-0
-</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -4973,9 +4377,6 @@ WG6694110-DNA\_D02\_L2
 </td>
 <td style="text-align:right;">
 0.000
-</td>
-<td style="text-align:right;">
-0
 </td>
 </tr>
 <tr>
@@ -4994,9 +4395,6 @@ WG6694110-DNA\_D03\_17m
 <td style="text-align:right;">
 0.000
 </td>
-<td style="text-align:right;">
-0
-</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -5009,13 +4407,10 @@ WG6694110-DNA\_D04\_10kis2
 0
 </td>
 <td style="text-align:right;">
-1.000
-</td>
-<td style="text-align:right;">
 0.000
 </td>
 <td style="text-align:right;">
-0
+1.000
 </td>
 </tr>
 <tr>
@@ -5023,19 +4418,16 @@ WG6694110-DNA\_D04\_10kis2
 WG6694110-DNA\_D05\_9mks2
 </td>
 <td style="text-align:right;">
-0
-</td>
-<td style="text-align:right;">
-0
-</td>
-<td style="text-align:right;">
-0.000
-</td>
-<td style="text-align:right;">
-0.000
-</td>
-<td style="text-align:right;">
 1
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0.000
 </td>
 </tr>
 <tr>
@@ -5043,7 +4435,7 @@ WG6694110-DNA\_D05\_9mks2
 WG6694110-DNA\_D06\_2kisX1
 </td>
 <td style="text-align:right;">
-1
+0
 </td>
 <td style="text-align:right;">
 0
@@ -5052,10 +4444,7 @@ WG6694110-DNA\_D06\_2kisX1
 0.000
 </td>
 <td style="text-align:right;">
-0.000
-</td>
-<td style="text-align:right;">
-0
+1.000
 </td>
 </tr>
 <tr>
@@ -5069,13 +4458,10 @@ WG6694110-DNA\_D07\_15kis211
 0
 </td>
 <td style="text-align:right;">
-0.000
-</td>
-<td style="text-align:right;">
 1.000
 </td>
 <td style="text-align:right;">
-0
+0.000
 </td>
 </tr>
 <tr>
@@ -5089,13 +4475,10 @@ WG6694110-DNA\_D08\_2kis1
 0
 </td>
 <td style="text-align:right;">
-0.000
-</td>
-<td style="text-align:right;">
 1.000
 </td>
 <td style="text-align:right;">
-0
+0.000
 </td>
 </tr>
 <tr>
@@ -5109,13 +4492,10 @@ WG6694110-DNA\_D09\_2kisPK\_19
 0
 </td>
 <td style="text-align:right;">
-0.000
-</td>
-<td style="text-align:right;">
 1.000
 </td>
 <td style="text-align:right;">
-0
+0.000
 </td>
 </tr>
 <tr>
@@ -5129,13 +4509,10 @@ WG6694110-DNA\_D10\_5kis\_21
 0
 </td>
 <td style="text-align:right;">
-0.000
-</td>
-<td style="text-align:right;">
 1.000
 </td>
 <td style="text-align:right;">
-0
+0.000
 </td>
 </tr>
 <tr>
@@ -5149,13 +4526,10 @@ WG6694110-DNA\_D12\_11kis1
 0
 </td>
 <td style="text-align:right;">
-0.000
-</td>
-<td style="text-align:right;">
 1.000
 </td>
 <td style="text-align:right;">
-0
+0.000
 </td>
 </tr>
 <tr>
@@ -5169,13 +4543,10 @@ WG6694110-DNA\_E01\_10kisZ
 0
 </td>
 <td style="text-align:right;">
-1.000
-</td>
-<td style="text-align:right;">
 0.000
 </td>
 <td style="text-align:right;">
-0
+1.000
 </td>
 </tr>
 <tr>
@@ -5189,13 +4560,10 @@ WG6694110-DNA\_E02\_1lub\_bel\_2712
 0
 </td>
 <td style="text-align:right;">
-0.000
-</td>
-<td style="text-align:right;">
 1.000
 </td>
 <td style="text-align:right;">
-0
+0.000
 </td>
 </tr>
 <tr>
@@ -5209,13 +4577,10 @@ WG6694110-DNA\_E03\_4kis\_2612
 0
 </td>
 <td style="text-align:right;">
-0.000
-</td>
-<td style="text-align:right;">
 1.000
 </td>
 <td style="text-align:right;">
-0
+0.000
 </td>
 </tr>
 <tr>
@@ -5229,13 +4594,10 @@ WG6694110-DNA\_E04\_10kis\_Z1
 0
 </td>
 <td style="text-align:right;">
-1.000
-</td>
-<td style="text-align:right;">
 0.000
 </td>
 <td style="text-align:right;">
-0
+1.000
 </td>
 </tr>
 <tr>
@@ -5249,13 +4611,10 @@ WG6694110-DNA\_E05\_13kis2
 0
 </td>
 <td style="text-align:right;">
-0.000
-</td>
-<td style="text-align:right;">
 1.000
 </td>
 <td style="text-align:right;">
-0
+0.000
 </td>
 </tr>
 <tr>
@@ -5269,13 +4628,10 @@ WG6694110-DNA\_E06\_3kis21
 0
 </td>
 <td style="text-align:right;">
-0.000
-</td>
-<td style="text-align:right;">
 1.000
 </td>
 <td style="text-align:right;">
-0
+0.000
 </td>
 </tr>
 <tr>
@@ -5289,13 +4645,10 @@ WG6694110-DNA\_E07\_16kis21
 0
 </td>
 <td style="text-align:right;">
-0.000
-</td>
-<td style="text-align:right;">
 1.000
 </td>
 <td style="text-align:right;">
-0
+0.000
 </td>
 </tr>
 <tr>
@@ -5309,13 +4662,10 @@ WG6694110-DNA\_E08\_8kis21
 0
 </td>
 <td style="text-align:right;">
-0.000
-</td>
-<td style="text-align:right;">
 1.000
 </td>
 <td style="text-align:right;">
-0
+0.000
 </td>
 </tr>
 <tr>
@@ -5329,13 +4679,10 @@ WG6694110-DNA\_E09\_3kis3112
 0
 </td>
 <td style="text-align:right;">
-0.000
-</td>
-<td style="text-align:right;">
 1.000
 </td>
 <td style="text-align:right;">
-0
+0.000
 </td>
 </tr>
 <tr>
@@ -5349,13 +4696,10 @@ WG6694110-DNA\_E10\_XY1
 0
 </td>
 <td style="text-align:right;">
-1.000
-</td>
-<td style="text-align:right;">
 0.000
 </td>
 <td style="text-align:right;">
-0
+1.000
 </td>
 </tr>
 <tr>
@@ -5369,13 +4713,10 @@ WG6694110-DNA\_E12\_kisX1
 0
 </td>
 <td style="text-align:right;">
-1.000
-</td>
-<td style="text-align:right;">
 0.000
 </td>
 <td style="text-align:right;">
-0
+1.000
 </td>
 </tr>
 <tr>
@@ -5394,9 +4735,6 @@ WG6694110-DNA\_F01\_34m1
 <td style="text-align:right;">
 0.000
 </td>
-<td style="text-align:right;">
-0
-</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -5414,9 +4752,6 @@ WG6694110-DNA\_F02\_3kis\_P
 <td style="text-align:right;">
 0.000
 </td>
-<td style="text-align:right;">
-0
-</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -5429,13 +4764,10 @@ WG6694110-DNA\_F04\_11kis44
 0
 </td>
 <td style="text-align:right;">
-0.000
-</td>
-<td style="text-align:right;">
 1.000
 </td>
 <td style="text-align:right;">
-0
+0.000
 </td>
 </tr>
 <tr>
@@ -5449,13 +4781,10 @@ WG6694110-DNA\_F05\_Tsp\_2512
 0
 </td>
 <td style="text-align:right;">
-0.000
-</td>
-<td style="text-align:right;">
 1.000
 </td>
 <td style="text-align:right;">
-0
+0.000
 </td>
 </tr>
 <tr>
@@ -5469,13 +4798,10 @@ WG6694110-DNA\_F06\_5kis2
 0
 </td>
 <td style="text-align:right;">
-1.000
-</td>
-<td style="text-align:right;">
 0.000
 </td>
 <td style="text-align:right;">
-0
+1.000
 </td>
 </tr>
 <tr>
@@ -5494,9 +4820,6 @@ WG6694110-DNA\_F09\_44m1
 <td style="text-align:right;">
 0.000
 </td>
-<td style="text-align:right;">
-0
-</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -5514,9 +4837,6 @@ WG6694110-DNA\_F10\_6m2
 <td style="text-align:right;">
 0.000
 </td>
-<td style="text-align:right;">
-0
-</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -5529,13 +4849,10 @@ WG6694110-DNA\_F11\_2PK19\_2612
 0
 </td>
 <td style="text-align:right;">
-0.000
-</td>
-<td style="text-align:right;">
 1.000
 </td>
 <td style="text-align:right;">
-0
+0.000
 </td>
 </tr>
 <tr>
@@ -5549,13 +4866,10 @@ WG6694110-DNA\_F12\_12kis21Z
 0
 </td>
 <td style="text-align:right;">
-0.000
-</td>
-<td style="text-align:right;">
 1.000
 </td>
 <td style="text-align:right;">
-0
+0.000
 </td>
 </tr>
 <tr>
@@ -5569,13 +4883,10 @@ WG6694110-DNA\_G01\_2LB1
 0
 </td>
 <td style="text-align:right;">
-0.000
-</td>
-<td style="text-align:right;">
 1.000
 </td>
 <td style="text-align:right;">
-0
+0.000
 </td>
 </tr>
 <tr>
@@ -5589,13 +4900,10 @@ WG6694110-DNA\_G02\_35m2
 0
 </td>
 <td style="text-align:right;">
-0.000
-</td>
-<td style="text-align:right;">
 1.000
 </td>
 <td style="text-align:right;">
-0
+0.000
 </td>
 </tr>
 <tr>
@@ -5609,13 +4917,10 @@ WG6694110-DNA\_G03\_8Tsp\_2512
 0
 </td>
 <td style="text-align:right;">
-0.059
+0.920
 </td>
 <td style="text-align:right;">
-0.941
-</td>
-<td style="text-align:right;">
-0
+0.080
 </td>
 </tr>
 <tr>
@@ -5623,19 +4928,16 @@ WG6694110-DNA\_G03\_8Tsp\_2512
 WG6694110-DNA\_G04\_9tshp
 </td>
 <td style="text-align:right;">
-0
-</td>
-<td style="text-align:right;">
-0
-</td>
-<td style="text-align:right;">
-0.000
-</td>
-<td style="text-align:right;">
-0.000
-</td>
-<td style="text-align:right;">
 1
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0.000
 </td>
 </tr>
 <tr>
@@ -5649,13 +4951,10 @@ WG6694110-DNA\_G05\_2kisN
 0
 </td>
 <td style="text-align:right;">
-0.000
-</td>
-<td style="text-align:right;">
 1.000
 </td>
 <td style="text-align:right;">
-0
+0.000
 </td>
 </tr>
 <tr>
@@ -5663,7 +4962,7 @@ WG6694110-DNA\_G05\_2kisN
 WG6694110-DNA\_G06\_2kis2A
 </td>
 <td style="text-align:right;">
-1
+0
 </td>
 <td style="text-align:right;">
 0
@@ -5672,10 +4971,7 @@ WG6694110-DNA\_G06\_2kis2A
 0.000
 </td>
 <td style="text-align:right;">
-0.000
-</td>
-<td style="text-align:right;">
-0
+1.000
 </td>
 </tr>
 <tr>
@@ -5689,13 +4985,10 @@ WG6694110-DNA\_G07\_11kis
 0
 </td>
 <td style="text-align:right;">
-0.000
-</td>
-<td style="text-align:right;">
 1.000
 </td>
 <td style="text-align:right;">
-0
+0.000
 </td>
 </tr>
 <tr>
@@ -5709,13 +5002,10 @@ WG6694110-DNA\_G08\_5kin
 0
 </td>
 <td style="text-align:right;">
-1.000
-</td>
-<td style="text-align:right;">
 0.000
 </td>
 <td style="text-align:right;">
-0
+1.000
 </td>
 </tr>
 <tr>
@@ -5729,13 +5019,10 @@ WG6694110-DNA\_G09\_10kis\_N
 0
 </td>
 <td style="text-align:right;">
-1.000
-</td>
-<td style="text-align:right;">
 0.000
 </td>
 <td style="text-align:right;">
-0
+1.000
 </td>
 </tr>
 <tr>
@@ -5754,9 +5041,6 @@ WG6694110-DNA\_G10\_N2
 <td style="text-align:right;">
 0.000
 </td>
-<td style="text-align:right;">
-0
-</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -5766,16 +5050,13 @@ WG6694110-DNA\_G11\_D1
 0
 </td>
 <td style="text-align:right;">
-0
-</td>
-<td style="text-align:right;">
-0.000
-</td>
-<td style="text-align:right;">
-0.000
-</td>
-<td style="text-align:right;">
 1
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0.000
 </td>
 </tr>
 <tr>
@@ -5794,9 +5075,6 @@ WG6694110-DNA\_G12\_41m
 <td style="text-align:right;">
 0.000
 </td>
-<td style="text-align:right;">
-0
-</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -5813,9 +5091,6 @@ WG6694110-DNA\_H01\_67styl1
 </td>
 <td style="text-align:right;">
 0.000
-</td>
-<td style="text-align:right;">
-0
 </td>
 </tr>
 <tr>
@@ -5834,9 +5109,6 @@ WG6694110-DNA\_H02\_49m
 <td style="text-align:right;">
 0.000
 </td>
-<td style="text-align:right;">
-0
-</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -5853,9 +5125,6 @@ WG6694110-DNA\_H03\_27m
 </td>
 <td style="text-align:right;">
 0.000
-</td>
-<td style="text-align:right;">
-0
 </td>
 </tr>
 <tr>
@@ -5874,9 +5143,6 @@ WG6694110-DNA\_H04\_30m
 <td style="text-align:right;">
 0.000
 </td>
-<td style="text-align:right;">
-0
-</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -5893,9 +5159,6 @@ WG6694110-DNA\_H05\_H3
 </td>
 <td style="text-align:right;">
 0.000
-</td>
-<td style="text-align:right;">
-0
 </td>
 </tr>
 <tr>
@@ -5914,9 +5177,6 @@ WG6694110-DNA\_H06\_26m
 <td style="text-align:right;">
 0.000
 </td>
-<td style="text-align:right;">
-0
-</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -5929,13 +5189,10 @@ WG6694110-DNA\_H07\_4lukusa
 0
 </td>
 <td style="text-align:right;">
-0.000
-</td>
-<td style="text-align:right;">
 1.000
 </td>
 <td style="text-align:right;">
-0
+0.000
 </td>
 </tr>
 <tr>
@@ -5954,9 +5211,6 @@ WG6694110-DNA\_H09\_D2
 <td style="text-align:right;">
 0.000
 </td>
-<td style="text-align:right;">
-0
-</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -5973,9 +5227,6 @@ WG6694110-DNA\_H11\_K1
 </td>
 <td style="text-align:right;">
 0.000
-</td>
-<td style="text-align:right;">
-0
 </td>
 </tr>
 <tr>
@@ -5994,9 +5245,6 @@ WG6694110-DNA\_H12\_B21
 <td style="text-align:right;">
 0.000
 </td>
-<td style="text-align:right;">
-0
-</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -6009,13 +5257,10 @@ WG6694111-DNA\_A01\_47m
 0
 </td>
 <td style="text-align:right;">
-1.000
-</td>
-<td style="text-align:right;">
 0.000
 </td>
 <td style="text-align:right;">
-0
+1.000
 </td>
 </tr>
 <tr>
@@ -6029,13 +5274,10 @@ WG6694111-DNA\_A02\_10kis21
 0
 </td>
 <td style="text-align:right;">
-0.000
-</td>
-<td style="text-align:right;">
 1.000
 </td>
 <td style="text-align:right;">
-0
+0.000
 </td>
 </tr>
 <tr>
@@ -6049,13 +5291,10 @@ WG6694111-DNA\_C01\_1kis21
 0
 </td>
 <td style="text-align:right;">
-0.000
-</td>
-<td style="text-align:right;">
 1.000
 </td>
 <td style="text-align:right;">
-0
+0.000
 </td>
 </tr>
 <tr>
@@ -6074,9 +5313,6 @@ WG6694111-DNA\_D01\_45m
 <td style="text-align:right;">
 0.000
 </td>
-<td style="text-align:right;">
-0
-</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -6089,13 +5325,10 @@ WG6694111-DNA\_D02\_2kis\_2612
 0
 </td>
 <td style="text-align:right;">
-0.000
-</td>
-<td style="text-align:right;">
 1.000
 </td>
 <td style="text-align:right;">
-0
+0.000
 </td>
 </tr>
 <tr>
@@ -6114,9 +5347,6 @@ WG6694111-DNA\_E01\_28m
 <td style="text-align:right;">
 0.000
 </td>
-<td style="text-align:right;">
-0
-</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -6134,9 +5364,6 @@ WG6694111-DNA\_F01\_67styl
 <td style="text-align:right;">
 0.000
 </td>
-<td style="text-align:right;">
-0
-</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -6149,13 +5376,10 @@ WG6694111-DNA\_G01\_6styl
 0
 </td>
 <td style="text-align:right;">
-0.000
-</td>
-<td style="text-align:right;">
 1.000
 </td>
 <td style="text-align:right;">
-0
+0.000
 </td>
 </tr>
 <tr>
@@ -6169,13 +5393,10 @@ WG6694111-DNA\_H01\_10kis214
 0
 </td>
 <td style="text-align:right;">
-1.000
-</td>
-<td style="text-align:right;">
 0.000
 </td>
 <td style="text-align:right;">
-0
+1.000
 </td>
 </tr>
 </tbody>
@@ -6183,7 +5404,7 @@ WG6694111-DNA\_H01\_10kis214
 
 The prior group assignments (from find.clusters) and the post group
 assignments (from dapc) don’t differ much, only at group 3 and 4 by one
-individual.
+individual. And group 1 only has 2 individuals, definite outliers.
 
 The slot `assign.per.pop` indicates the proportions of successful
 reassignment (based on the discriminant functions) of individuals to
@@ -6209,8 +5430,8 @@ way using `compoplot`
 ``` r
 require(RColorBrewer)
 
-myCol <-  brewer.pal(5, "Accent") # choose some colors
-compoplot(dapc1_pat, posi="bottomright", txt.leg=paste("Cluster", 1:5), lab="", xlab="individuals", col=myCol)
+myCol <-  brewer.pal(4, "Accent") # choose some colors
+compoplot(dapc1_pat, posi="bottomright", txt.leg=paste("Cluster", 1:4), lab="", xlab="individuals", col=myCol)
 ```
 
 ![](SNP-Chip_Data_Analysis_with_Plink_and_R_files/figure-gfm/unnamed-chunk-9-1.png)<!-- -->
@@ -6246,116 +5467,120 @@ devtools::session_info()
     ##  collate  English_United States.1252  
     ##  ctype    English_United States.1252  
     ##  tz       Africa/Nairobi              
-    ##  date     2021-04-12                  
+    ##  date     2021-05-27                  
     ## 
     ## - Packages -------------------------------------------------------------------
-    ##  package      * version date       lib source        
-    ##  ade4         * 1.7-16  2020-10-28 [2] CRAN (R 4.0.3)
-    ##  adegenet     * 2.1.3   2020-05-10 [2] CRAN (R 4.0.4)
-    ##  ape          * 5.4-1   2020-08-13 [2] CRAN (R 4.0.3)
-    ##  assertthat     0.2.1   2019-03-21 [2] CRAN (R 4.0.3)
-    ##  boot           1.3-25  2020-04-26 [2] CRAN (R 4.0.3)
-    ##  callr          3.5.1   2020-10-13 [2] CRAN (R 4.0.3)
-    ##  class          7.3-17  2020-04-26 [2] CRAN (R 4.0.3)
-    ##  classInt       0.4-3   2020-04-07 [2] CRAN (R 4.0.4)
-    ##  cli            2.2.0   2020-11-20 [2] CRAN (R 4.0.3)
-    ##  cluster        2.1.0   2019-06-19 [2] CRAN (R 4.0.3)
-    ##  coda           0.19-4  2020-09-30 [2] CRAN (R 4.0.4)
-    ##  codetools      0.2-18  2020-11-04 [2] CRAN (R 4.0.3)
-    ##  colorspace     2.0-0   2020-11-11 [2] CRAN (R 4.0.3)
-    ##  crayon         1.3.4   2017-09-16 [2] CRAN (R 4.0.3)
-    ##  DBI            1.1.1   2021-01-15 [2] CRAN (R 4.0.3)
-    ##  deldir         0.2-10  2021-02-16 [2] CRAN (R 4.0.4)
-    ##  desc           1.2.0   2018-05-01 [2] CRAN (R 4.0.3)
-    ##  devtools       2.3.2   2020-09-18 [2] CRAN (R 4.0.3)
-    ##  digest         0.6.27  2020-10-24 [1] CRAN (R 4.0.3)
-    ##  dplyr          1.0.3   2021-01-15 [2] CRAN (R 4.0.3)
-    ##  e1071          1.7-6   2021-03-18 [2] CRAN (R 4.0.4)
-    ##  ellipsis       0.3.1   2020-05-15 [2] CRAN (R 4.0.3)
-    ##  evaluate       0.14    2019-05-28 [2] CRAN (R 4.0.3)
-    ##  expm           0.999-6 2021-01-13 [2] CRAN (R 4.0.4)
-    ##  fansi          0.4.2   2021-01-15 [2] CRAN (R 4.0.3)
-    ##  farver         2.0.3   2020-01-16 [2] CRAN (R 4.0.3)
-    ##  fastmap        1.0.1   2019-10-08 [2] CRAN (R 4.0.3)
-    ##  fs             1.5.0   2020-07-31 [2] CRAN (R 4.0.3)
-    ##  gdata          2.18.0  2017-06-06 [2] CRAN (R 4.0.3)
-    ##  generics       0.1.0   2020-10-31 [2] CRAN (R 4.0.3)
-    ##  ggplot2      * 3.3.3   2020-12-30 [2] CRAN (R 4.0.3)
-    ##  glue           1.4.2   2020-08-27 [2] CRAN (R 4.0.3)
-    ##  gmodels        2.18.1  2018-06-25 [2] CRAN (R 4.0.4)
-    ##  gtable         0.3.0   2019-03-25 [2] CRAN (R 4.0.3)
-    ##  gtools         3.8.2   2020-03-31 [2] CRAN (R 4.0.3)
-    ##  highr          0.8     2019-03-20 [2] CRAN (R 4.0.3)
-    ##  hms            1.0.0   2021-01-13 [2] CRAN (R 4.0.3)
-    ##  htmltools      0.5.1   2021-01-12 [2] CRAN (R 4.0.3)
-    ##  httpuv         1.5.5   2021-01-13 [2] CRAN (R 4.0.3)
-    ##  httr           1.4.2   2020-07-20 [2] CRAN (R 4.0.3)
-    ##  igraph         1.2.6   2020-10-06 [2] CRAN (R 4.0.3)
-    ##  kableExtra     1.3.1   2020-10-22 [2] CRAN (R 4.0.3)
-    ##  KernSmooth     2.23-18 2020-10-29 [2] CRAN (R 4.0.3)
-    ##  knitr          1.30    2020-09-22 [2] CRAN (R 4.0.3)
-    ##  labeling       0.4.2   2020-10-20 [2] CRAN (R 4.0.3)
-    ##  later          1.1.0.1 2020-06-05 [2] CRAN (R 4.0.3)
-    ##  lattice        0.20-41 2020-04-02 [2] CRAN (R 4.0.3)
-    ##  LearnBayes     2.15.1  2018-03-18 [2] CRAN (R 4.0.3)
-    ##  lifecycle      0.2.0   2020-03-06 [2] CRAN (R 4.0.3)
-    ##  magrittr       2.0.1   2020-11-17 [2] CRAN (R 4.0.3)
-    ##  MASS           7.3-53  2020-09-09 [2] CRAN (R 4.0.3)
-    ##  Matrix         1.3-2   2021-01-06 [2] CRAN (R 4.0.3)
-    ##  memoise        1.1.0   2017-04-21 [2] CRAN (R 4.0.3)
-    ##  mgcv           1.8-33  2020-08-27 [2] CRAN (R 4.0.3)
-    ##  mime           0.9     2020-02-04 [2] CRAN (R 4.0.3)
-    ##  munsell        0.5.0   2018-06-12 [2] CRAN (R 4.0.3)
-    ##  nlme           3.1-151 2020-12-10 [2] CRAN (R 4.0.3)
-    ##  pegas        * 0.14    2020-09-16 [2] CRAN (R 4.0.4)
-    ##  permute        0.9-5   2019-03-12 [2] CRAN (R 4.0.3)
-    ##  pillar         1.4.7   2020-11-20 [2] CRAN (R 4.0.3)
-    ##  pkgbuild       1.2.0   2020-12-15 [2] CRAN (R 4.0.3)
-    ##  pkgconfig      2.0.3   2019-09-22 [2] CRAN (R 4.0.3)
-    ##  pkgload        1.1.0   2020-05-29 [2] CRAN (R 4.0.3)
-    ##  plyr           1.8.6   2020-03-03 [2] CRAN (R 4.0.3)
-    ##  prettyunits    1.1.1   2020-01-24 [2] CRAN (R 4.0.3)
-    ##  processx       3.4.5   2020-11-30 [2] CRAN (R 4.0.3)
-    ##  progress       1.2.2   2019-05-16 [2] CRAN (R 4.0.3)
-    ##  promises       1.1.1   2020-06-09 [2] CRAN (R 4.0.3)
-    ##  proxy          0.4-25  2021-03-05 [2] CRAN (R 4.0.4)
-    ##  ps             1.5.0   2020-12-05 [2] CRAN (R 4.0.3)
-    ##  purrr          0.3.4   2020-04-17 [2] CRAN (R 4.0.3)
-    ##  R6             2.5.0   2020-10-28 [2] CRAN (R 4.0.3)
-    ##  raster         3.4-5   2020-11-14 [2] CRAN (R 4.0.4)
-    ##  RColorBrewer * 1.1-2   2014-12-07 [2] CRAN (R 4.0.3)
-    ##  Rcpp           1.0.6   2021-01-15 [2] CRAN (R 4.0.3)
-    ##  remotes        2.2.0   2020-07-21 [2] CRAN (R 4.0.3)
-    ##  reshape2       1.4.4   2020-04-09 [2] CRAN (R 4.0.3)
-    ##  rlang          0.4.10  2020-12-30 [2] CRAN (R 4.0.3)
-    ##  rmarkdown      2.6     2020-12-14 [2] CRAN (R 4.0.3)
-    ##  rprojroot      2.0.2   2020-11-15 [2] CRAN (R 4.0.3)
-    ##  rstudioapi     0.13    2020-11-12 [2] CRAN (R 4.0.3)
-    ##  rvest          0.3.6   2020-07-25 [2] CRAN (R 4.0.3)
-    ##  scales         1.1.1   2020-05-11 [2] CRAN (R 4.0.3)
-    ##  seqinr         4.2-5   2020-12-17 [2] CRAN (R 4.0.4)
-    ##  sessioninfo    1.1.1   2018-11-05 [2] CRAN (R 4.0.3)
-    ##  sf             0.9-8   2021-03-17 [2] CRAN (R 4.0.4)
-    ##  shiny          1.5.0   2020-06-23 [2] CRAN (R 4.0.3)
-    ##  sp             1.4-5   2021-01-10 [2] CRAN (R 4.0.3)
-    ##  spData         0.3.8   2020-07-03 [2] CRAN (R 4.0.4)
-    ##  spdep          1.1-7   2021-04-03 [2] CRAN (R 4.0.5)
-    ##  stringi        1.5.3   2020-09-09 [2] CRAN (R 4.0.3)
-    ##  stringr        1.4.0   2019-02-10 [2] CRAN (R 4.0.3)
-    ##  testthat       3.0.1   2020-12-17 [2] CRAN (R 4.0.3)
-    ##  tibble         3.0.5   2021-01-15 [2] CRAN (R 4.0.3)
-    ##  tidyselect     1.1.0   2020-05-11 [2] CRAN (R 4.0.3)
-    ##  units          0.7-1   2021-03-16 [2] CRAN (R 4.0.4)
-    ##  usethis        2.0.0   2020-12-10 [2] CRAN (R 4.0.3)
-    ##  vctrs          0.3.6   2020-12-17 [2] CRAN (R 4.0.3)
-    ##  vegan          2.5-7   2020-11-28 [2] CRAN (R 4.0.3)
-    ##  viridisLite    0.3.0   2018-02-01 [2] CRAN (R 4.0.3)
-    ##  webshot        0.5.2   2019-11-22 [2] CRAN (R 4.0.3)
-    ##  withr          2.4.0   2021-01-16 [2] CRAN (R 4.0.3)
-    ##  xfun           0.20    2021-01-06 [2] CRAN (R 4.0.3)
-    ##  xml2           1.3.2   2020-04-23 [2] CRAN (R 4.0.3)
-    ##  xtable         1.8-4   2019-04-21 [2] CRAN (R 4.0.3)
-    ##  yaml           2.2.1   2020-02-01 [2] CRAN (R 4.0.3)
+    ##  package      * version  date       lib source        
+    ##  ade4         * 1.7-16   2020-10-28 [2] CRAN (R 4.0.3)
+    ##  adegenet     * 2.1.3    2020-05-10 [2] CRAN (R 4.0.4)
+    ##  ape          * 5.4-1    2020-08-13 [2] CRAN (R 4.0.3)
+    ##  assertthat     0.2.1    2019-03-21 [2] CRAN (R 4.0.3)
+    ##  boot           1.3-27   2021-02-12 [2] CRAN (R 4.0.5)
+    ##  cachem         1.0.4    2021-02-13 [2] CRAN (R 4.0.5)
+    ##  callr          3.6.0    2021-03-28 [2] CRAN (R 4.0.5)
+    ##  class          7.3-18   2021-01-24 [2] CRAN (R 4.0.5)
+    ##  classInt       0.4-3    2020-04-07 [2] CRAN (R 4.0.4)
+    ##  cli            2.4.0    2021-04-05 [2] CRAN (R 4.0.5)
+    ##  cluster        2.1.1    2021-02-14 [2] CRAN (R 4.0.5)
+    ##  coda           0.19-4   2020-09-30 [2] CRAN (R 4.0.4)
+    ##  codetools      0.2-18   2020-11-04 [2] CRAN (R 4.0.3)
+    ##  colorspace     2.0-0    2020-11-11 [2] CRAN (R 4.0.3)
+    ##  crayon         1.4.1    2021-02-08 [2] CRAN (R 4.0.5)
+    ##  DBI            1.1.1    2021-01-15 [2] CRAN (R 4.0.3)
+    ##  deldir         0.2-10   2021-02-16 [2] CRAN (R 4.0.4)
+    ##  desc           1.3.0    2021-03-05 [2] CRAN (R 4.0.5)
+    ##  devtools       2.4.1    2021-05-05 [2] CRAN (R 4.0.5)
+    ##  digest         0.6.27   2020-10-24 [1] CRAN (R 4.0.3)
+    ##  dplyr          1.0.3    2021-01-15 [2] CRAN (R 4.0.3)
+    ##  e1071          1.7-6    2021-03-18 [2] CRAN (R 4.0.4)
+    ##  ellipsis       0.3.1    2020-05-15 [2] CRAN (R 4.0.3)
+    ##  evaluate       0.14     2019-05-28 [2] CRAN (R 4.0.3)
+    ##  expm           0.999-6  2021-01-13 [2] CRAN (R 4.0.4)
+    ##  fansi          0.4.2    2021-01-15 [2] CRAN (R 4.0.3)
+    ##  farver         2.0.3    2020-01-16 [2] CRAN (R 4.0.3)
+    ##  fastmap        1.1.0    2021-01-25 [2] CRAN (R 4.0.5)
+    ##  fs             1.5.0    2020-07-31 [2] CRAN (R 4.0.3)
+    ##  gdata          2.18.0   2017-06-06 [2] CRAN (R 4.0.3)
+    ##  generics       0.1.0    2020-10-31 [2] CRAN (R 4.0.3)
+    ##  ggplot2      * 3.3.3    2020-12-30 [2] CRAN (R 4.0.3)
+    ##  glue           1.4.2    2020-08-27 [2] CRAN (R 4.0.3)
+    ##  gmodels        2.18.1   2018-06-25 [2] CRAN (R 4.0.4)
+    ##  gtable         0.3.0    2019-03-25 [2] CRAN (R 4.0.3)
+    ##  gtools         3.8.2    2020-03-31 [2] CRAN (R 4.0.3)
+    ##  highr          0.9      2021-04-16 [2] CRAN (R 4.0.5)
+    ##  hms            1.0.0    2021-01-13 [2] CRAN (R 4.0.3)
+    ##  htmltools      0.5.1    2021-01-12 [2] CRAN (R 4.0.3)
+    ##  httpuv         1.5.5    2021-01-13 [2] CRAN (R 4.0.3)
+    ##  httr           1.4.2    2020-07-20 [2] CRAN (R 4.0.3)
+    ##  igraph         1.2.6    2020-10-06 [2] CRAN (R 4.0.3)
+    ##  kableExtra     1.3.4    2021-02-20 [2] CRAN (R 4.0.5)
+    ##  KernSmooth     2.23-18  2020-10-29 [2] CRAN (R 4.0.3)
+    ##  knitr          1.33     2021-04-24 [2] CRAN (R 4.0.5)
+    ##  labeling       0.4.2    2020-10-20 [2] CRAN (R 4.0.3)
+    ##  later          1.1.0.1  2020-06-05 [2] CRAN (R 4.0.3)
+    ##  lattice        0.20-41  2020-04-02 [2] CRAN (R 4.0.3)
+    ##  LearnBayes     2.15.1   2018-03-18 [2] CRAN (R 4.0.3)
+    ##  lifecycle      1.0.0    2021-02-15 [2] CRAN (R 4.0.5)
+    ##  magrittr       2.0.1    2020-11-17 [2] CRAN (R 4.0.3)
+    ##  MASS           7.3-53.1 2021-02-12 [2] CRAN (R 4.0.5)
+    ##  Matrix         1.3-2    2021-01-06 [2] CRAN (R 4.0.3)
+    ##  memoise        2.0.0    2021-01-26 [2] CRAN (R 4.0.5)
+    ##  mgcv           1.8-34   2021-02-16 [2] CRAN (R 4.0.5)
+    ##  mime           0.10     2021-02-13 [2] CRAN (R 4.0.4)
+    ##  munsell        0.5.0    2018-06-12 [2] CRAN (R 4.0.3)
+    ##  nlme           3.1-152  2021-02-04 [2] CRAN (R 4.0.5)
+    ##  pegas        * 1.0      2021-04-08 [2] CRAN (R 4.0.5)
+    ##  permute        0.9-5    2019-03-12 [2] CRAN (R 4.0.3)
+    ##  pillar         1.6.0    2021-04-13 [2] CRAN (R 4.0.5)
+    ##  pkgbuild       1.2.0    2020-12-15 [2] CRAN (R 4.0.3)
+    ##  pkgconfig      2.0.3    2019-09-22 [2] CRAN (R 4.0.3)
+    ##  pkgload        1.2.1    2021-04-06 [2] CRAN (R 4.0.5)
+    ##  plyr           1.8.6    2020-03-03 [2] CRAN (R 4.0.3)
+    ##  prettyunits    1.1.1    2020-01-24 [2] CRAN (R 4.0.3)
+    ##  processx       3.5.2    2021-04-30 [2] CRAN (R 4.0.5)
+    ##  progress       1.2.2    2019-05-16 [2] CRAN (R 4.0.3)
+    ##  promises       1.2.0.1  2021-02-11 [2] CRAN (R 4.0.5)
+    ##  proxy          0.4-25   2021-03-05 [2] CRAN (R 4.0.4)
+    ##  ps             1.5.0    2020-12-05 [2] CRAN (R 4.0.3)
+    ##  purrr          0.3.4    2020-04-17 [2] CRAN (R 4.0.3)
+    ##  R6             2.5.0    2020-10-28 [2] CRAN (R 4.0.3)
+    ##  raster         3.4-5    2020-11-14 [2] CRAN (R 4.0.4)
+    ##  RColorBrewer * 1.1-2    2014-12-07 [2] CRAN (R 4.0.3)
+    ##  Rcpp           1.0.6    2021-01-15 [2] CRAN (R 4.0.3)
+    ##  remotes        2.3.0    2021-04-01 [2] CRAN (R 4.0.5)
+    ##  reshape2       1.4.4    2020-04-09 [2] CRAN (R 4.0.3)
+    ##  rlang          0.4.10   2020-12-30 [2] CRAN (R 4.0.3)
+    ##  rmarkdown      2.8      2021-05-07 [2] CRAN (R 4.0.5)
+    ##  rprojroot      2.0.2    2020-11-15 [2] CRAN (R 4.0.3)
+    ##  rstudioapi     0.13     2020-11-12 [2] CRAN (R 4.0.3)
+    ##  rvest          1.0.0    2021-03-09 [2] CRAN (R 4.0.5)
+    ##  scales         1.1.1    2020-05-11 [2] CRAN (R 4.0.3)
+    ##  seqinr         4.2-5    2020-12-17 [2] CRAN (R 4.0.4)
+    ##  sessioninfo    1.1.1    2018-11-05 [2] CRAN (R 4.0.3)
+    ##  sf             0.9-8    2021-03-17 [2] CRAN (R 4.0.4)
+    ##  shiny          1.6.0    2021-01-25 [2] CRAN (R 4.0.5)
+    ##  sp             1.4-5    2021-01-10 [2] CRAN (R 4.0.3)
+    ##  spData         0.3.8    2020-07-03 [2] CRAN (R 4.0.4)
+    ##  spdep          1.1-7    2021-04-03 [2] CRAN (R 4.0.5)
+    ##  stringi        1.5.3    2020-09-09 [2] CRAN (R 4.0.3)
+    ##  stringr        1.4.0    2019-02-10 [2] CRAN (R 4.0.3)
+    ##  svglite        2.0.0    2021-02-20 [2] CRAN (R 4.0.5)
+    ##  systemfonts    1.0.1    2021-02-09 [2] CRAN (R 4.0.5)
+    ##  testthat       3.0.2    2021-02-14 [2] CRAN (R 4.0.5)
+    ##  tibble         3.0.5    2021-01-15 [2] CRAN (R 4.0.3)
+    ##  tidyselect     1.1.0    2020-05-11 [2] CRAN (R 4.0.3)
+    ##  units          0.7-1    2021-03-16 [2] CRAN (R 4.0.4)
+    ##  usethis        2.0.1    2021-02-10 [2] CRAN (R 4.0.5)
+    ##  utf8           1.2.1    2021-03-12 [2] CRAN (R 4.0.5)
+    ##  vctrs          0.3.6    2020-12-17 [2] CRAN (R 4.0.3)
+    ##  vegan          2.5-7    2020-11-28 [2] CRAN (R 4.0.3)
+    ##  viridisLite    0.4.0    2021-04-13 [2] CRAN (R 4.0.5)
+    ##  webshot        0.5.2    2019-11-22 [2] CRAN (R 4.0.3)
+    ##  withr          2.4.1    2021-01-26 [2] CRAN (R 4.0.5)
+    ##  xfun           0.23     2021-05-15 [2] CRAN (R 4.0.3)
+    ##  xml2           1.3.2    2020-04-23 [2] CRAN (R 4.0.3)
+    ##  xtable         1.8-4    2019-04-21 [2] CRAN (R 4.0.3)
+    ##  yaml           2.2.1    2020-02-01 [2] CRAN (R 4.0.3)
     ## 
     ## [1] C:/Users/BWaweru/OneDrive - CGIAR/Documents/R/win-library/4.0
     ## [2] C:/R/R-4.0.3/library
