@@ -240,14 +240,14 @@ all(rownames(pat_pca_scores) == rownames(pheno_dat)) #its FASLE, lets rearrange
     ## [1] FALSE
 
 ``` r
-all(rownames(pat_pca_scores) == rownames(pheno_dat)) # now good to go!
-```
-
-    ## [1] FALSE
-
-``` r
 pheno_dat <- pheno_dat[rownames(pat_pca_scores),]
 
+all(rownames(pat_pca_scores) == rownames(pheno_dat)) # now good to go
+```
+
+    ## [1] TRUE
+
+``` r
 # we add the various phenotype variable we would like to color by
 
 pat_pca_scores$region <- pheno_dat$region
