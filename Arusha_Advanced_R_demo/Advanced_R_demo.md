@@ -1,9 +1,39 @@
 Arusha advanced R exmaples; Working with SNP data
 ================
 Bernice Waweru
-6/9/2021
+Wed 09, Jun 2021
 
-Upload the data,
+-   [Objective](#objective)
+    -   [Upload the data](#upload-the-data)
+    -   [Using `find.clusters` from
+        `adegenet`](#using-findclusters-from-adegenet)
+    -   [Describing clusters using
+        **DAPC**](#describing-clusters-using-dapc)
+    -   [Adding relevant phenotype data to the genotype
+        data](#adding-relevant-phenotype-data-to-the-genotype-data)
+        -   [Principal components
+            analysis](#principal-components-analysis)
+    -   [Session Information](#session-information)
+
+# Objective
+
+The main objective is to show the potential the statistical programming
+tool R has to do various type of analyses. Here we demonstrate using
+various packages within R to look at single nucleotide polymorphic (SNP)
+data that has been sequences from example individuals can be analyzed.
+We use R to find possible population structure within the data set.
+After which we use principal component analysis and look at which traits
+explain the greatest amount of variation within the data. Throughout the
+analysis we also get to see how we easy it is to manipulate the raw data
+within R to ensure and check fidelity of the data.
+
+We have a set of data, genotype and relevant map data that we load into
+R using the package **adegenet** `read.PLINK`. We will later also read
+in phenotype data that we will use for the PCA analysis.
+
+## Upload the data
+
+Upload the data we will use for this session.
 
 ``` r
 setwd("C:/Users/BWaweru/OneDrive - CGIAR/Documents/BecA-ILRI/Arusha_training_June_2021/Training_material/Day_3_Wednesday/")
@@ -72,7 +102,7 @@ read.PLINK("data-raw/example_geno_dat.raw", map.file = "data-raw/bin_patrick_202
     ## 
     ## ...done.
 
-Check that the loaded data is okay
+Check that the loaded data is okay;
 
 ``` r
 # ==== summary
@@ -121,7 +151,7 @@ locNames(dat)[1:10]
     ##  [7] "snp2815-scaffold1082-557554_A"   "snp2812-scaffold1082-438570_A"  
     ##  [9] "snp2810-scaffold1082-348665_G"   "snp2809-scaffold1082-312463_A"
 
-#### Using `find.clusters`
+## Using `find.clusters` from `adegenet`
 
 This function first transforms the data using PCA, asking the user to
 specify the number of retained PCs interactively unless the argument
@@ -129,7 +159,7 @@ specify the number of retained PCs interactively unless the argument
 
 We use `find.clusters` to identify potential clusters within our
 dataset, although as of now the true clusters are unknown. We evaluate
-*k= 40* clusters, a theoretical value, with `max.n.clust = 4`
+*k= 40* clusters, a theoretical value, with `max.n.clust = 5`
 
 ``` r
  grp <- find.clusters(dat, max.n.clust = 5) 
@@ -143,13 +173,15 @@ dataset, although as of now the true clusters are unknown. We evaluate
 save(grp, file = "results/grp.RData")
 ```
 
+We load the data saved out into the session.
+
 ``` r
 load("results/grp.RData")
 names(grp)
 ```
 
-Assigned groups are stored under `grp$grp`, as per the 4 clusters we
-chose to keep
+Assigned groups are stored under `grp$grp`, as per the 3 clusters we
+chose to keep;
 
 ``` r
 load("results/grp.RData")
@@ -172,7 +204,7 @@ grp$grp[1:10]
     ##                         3 
     ## Levels: 1 2 3
 
-#### Describing clusters using **DAPC**
+## Describing clusters using **DAPC**
 
 [`DAPC`](https://bmcgenomdata.biomedcentral.com/articles/10.1186/1471-2156-11-94)
 was pioneered by Jombart and colleagues (Jombart et al., 2010) and can
@@ -277,8 +309,8 @@ summary(dapc1)
     ##  1  2  3 
     ## 51  6 33
 
-Average assignment proportion, `assign.prop`, is quite high, 0.996.
-Looking closely at the assignment values;
+Average assignment proportion, `assign.prop`, is quite good. 1 for all
+the assignments. Looking closely at the assignment values;
 
 ``` r
 round(dapc1$posterior,3) -> assgn_values
@@ -386,7 +418,7 @@ reassignment (based on the discriminant functions) of individuals to
 their original clusters. Large values indicate clear-cut clusters, while
 low values suggest admixed groups.
 
-This information can also be visualized using `assignplot`
+This information can also be visualized using `assignplot`;
 
 ``` r
 assignplot(dapc1)
@@ -804,3 +836,160 @@ p
 ![](Advanced_R_demo_files/figure-gfm/unnamed-chunk-25-1.png)<!-- -->
 
 Ear orientation also explains no variation.
+
+## Session Information
+
+Details of packages used with the work flow
+
+``` r
+devtools::session_info()
+```
+
+    ## - Session info ---------------------------------------------------------------
+    ##  setting  value                       
+    ##  version  R version 4.0.3 (2020-10-10)
+    ##  os       Windows 10 x64              
+    ##  system   x86_64, mingw32             
+    ##  ui       RTerm                       
+    ##  language (EN)                        
+    ##  collate  English_United States.1252  
+    ##  ctype    English_United States.1252  
+    ##  tz       Africa/Nairobi              
+    ##  date     2021-06-09                  
+    ## 
+    ## - Packages -------------------------------------------------------------------
+    ##  package      * version   date       lib source        
+    ##  ade4         * 1.7-16    2020-10-28 [2] CRAN (R 4.0.3)
+    ##  adegenet     * 2.1.3     2020-05-10 [2] CRAN (R 4.0.4)
+    ##  ape          * 5.4-1     2020-08-13 [2] CRAN (R 4.0.3)
+    ##  assertthat     0.2.1     2019-03-21 [2] CRAN (R 4.0.3)
+    ##  boot           1.3-27    2021-02-12 [2] CRAN (R 4.0.5)
+    ##  cachem         1.0.4     2021-02-13 [2] CRAN (R 4.0.5)
+    ##  calibrate      1.7.7     2020-06-19 [2] CRAN (R 4.0.5)
+    ##  callr          3.6.0     2021-03-28 [2] CRAN (R 4.0.5)
+    ##  class          7.3-18    2021-01-24 [2] CRAN (R 4.0.5)
+    ##  classInt       0.4-3     2020-04-07 [2] CRAN (R 4.0.4)
+    ##  cli            2.4.0     2021-04-05 [2] CRAN (R 4.0.5)
+    ##  cluster        2.1.1     2021-02-14 [2] CRAN (R 4.0.5)
+    ##  coda           0.19-4    2020-09-30 [2] CRAN (R 4.0.4)
+    ##  codetools      0.2-18    2020-11-04 [2] CRAN (R 4.0.3)
+    ##  colorspace     2.0-0     2020-11-11 [2] CRAN (R 4.0.3)
+    ##  combinat       0.0-8     2012-10-29 [2] CRAN (R 4.0.3)
+    ##  crayon         1.4.1     2021-02-08 [2] CRAN (R 4.0.5)
+    ##  dartR        * 1.9.9.1   2021-05-28 [2] CRAN (R 4.0.5)
+    ##  data.table     1.14.0    2021-02-21 [2] CRAN (R 4.0.5)
+    ##  DBI            1.1.1     2021-01-15 [2] CRAN (R 4.0.3)
+    ##  deldir         0.2-10    2021-02-16 [2] CRAN (R 4.0.4)
+    ##  DEoptimR       1.0-9     2021-05-24 [2] CRAN (R 4.0.5)
+    ##  desc           1.3.0     2021-03-05 [2] CRAN (R 4.0.5)
+    ##  devtools       2.4.1     2021-05-05 [2] CRAN (R 4.0.5)
+    ##  digest         0.6.27    2020-10-24 [1] CRAN (R 4.0.3)
+    ##  dismo          1.3-3     2020-11-17 [2] CRAN (R 4.0.5)
+    ##  doParallel     1.0.16    2020-10-16 [2] CRAN (R 4.0.3)
+    ##  dplyr          1.0.3     2021-01-15 [2] CRAN (R 4.0.3)
+    ##  e1071          1.7-6     2021-03-18 [2] CRAN (R 4.0.4)
+    ##  ellipsis       0.3.1     2020-05-15 [2] CRAN (R 4.0.3)
+    ##  evaluate       0.14      2019-05-28 [2] CRAN (R 4.0.3)
+    ##  expm           0.999-6   2021-01-13 [2] CRAN (R 4.0.4)
+    ##  fansi          0.4.2     2021-01-15 [2] CRAN (R 4.0.3)
+    ##  farver         2.0.3     2020-01-16 [2] CRAN (R 4.0.3)
+    ##  fastmap        1.1.0     2021-01-25 [2] CRAN (R 4.0.5)
+    ##  foreach        1.5.1     2020-10-15 [2] CRAN (R 4.0.3)
+    ##  fs             1.5.0     2020-07-31 [2] CRAN (R 4.0.3)
+    ##  gap            1.2.3-1   2021-04-21 [2] CRAN (R 4.0.5)
+    ##  gdata          2.18.0    2017-06-06 [2] CRAN (R 4.0.3)
+    ##  gdistance      1.3-6     2020-06-29 [2] CRAN (R 4.0.5)
+    ##  gdsfmt         1.26.1    2020-12-22 [2] Bioconductor  
+    ##  generics       0.1.0     2020-10-31 [2] CRAN (R 4.0.3)
+    ##  genetics       1.3.8.1.3 2021-03-01 [2] CRAN (R 4.0.5)
+    ##  GGally         2.1.1     2021-03-08 [2] CRAN (R 4.0.5)
+    ##  ggplot2      * 3.3.3     2020-12-30 [2] CRAN (R 4.0.3)
+    ##  glue           1.4.2     2020-08-27 [2] CRAN (R 4.0.3)
+    ##  gmodels        2.18.1    2018-06-25 [2] CRAN (R 4.0.4)
+    ##  gridExtra      2.3       2017-09-09 [2] CRAN (R 4.0.3)
+    ##  gtable         0.3.0     2019-03-25 [2] CRAN (R 4.0.3)
+    ##  gtools         3.8.2     2020-03-31 [2] CRAN (R 4.0.3)
+    ##  hierfstat      0.5-7     2020-07-20 [2] CRAN (R 4.0.5)
+    ##  highr          0.9       2021-04-16 [2] CRAN (R 4.0.5)
+    ##  hms            1.0.0     2021-01-13 [2] CRAN (R 4.0.3)
+    ##  htmltools      0.5.1     2021-01-12 [2] CRAN (R 4.0.3)
+    ##  httpuv         1.5.5     2021-01-13 [2] CRAN (R 4.0.3)
+    ##  igraph         1.2.6     2020-10-06 [2] CRAN (R 4.0.3)
+    ##  iterators      1.0.13    2020-10-15 [2] CRAN (R 4.0.3)
+    ##  KernSmooth     2.23-18   2020-10-29 [2] CRAN (R 4.0.3)
+    ##  knitr          1.33      2021-04-24 [2] CRAN (R 4.0.5)
+    ##  labeling       0.4.2     2020-10-20 [2] CRAN (R 4.0.3)
+    ##  later          1.1.0.1   2020-06-05 [2] CRAN (R 4.0.3)
+    ##  lattice        0.20-41   2020-04-02 [2] CRAN (R 4.0.3)
+    ##  LearnBayes     2.15.1    2018-03-18 [2] CRAN (R 4.0.3)
+    ##  lifecycle      1.0.0     2021-02-15 [2] CRAN (R 4.0.5)
+    ##  magrittr       2.0.1     2020-11-17 [2] CRAN (R 4.0.3)
+    ##  MASS           7.3-53.1  2021-02-12 [2] CRAN (R 4.0.5)
+    ##  Matrix         1.3-2     2021-01-06 [2] CRAN (R 4.0.3)
+    ##  memoise        2.0.0     2021-01-26 [2] CRAN (R 4.0.5)
+    ##  mgcv           1.8-34    2021-02-16 [2] CRAN (R 4.0.5)
+    ##  mime           0.10      2021-02-13 [2] CRAN (R 4.0.4)
+    ##  mmod           1.3.3     2017-04-06 [2] CRAN (R 4.0.5)
+    ##  munsell        0.5.0     2018-06-12 [2] CRAN (R 4.0.3)
+    ##  mvtnorm        1.1-1     2020-06-09 [2] CRAN (R 4.0.3)
+    ##  nlme           3.1-152   2021-02-04 [2] CRAN (R 4.0.5)
+    ##  pegas        * 1.0       2021-04-08 [2] CRAN (R 4.0.5)
+    ##  permute        0.9-5     2019-03-12 [2] CRAN (R 4.0.3)
+    ##  pillar         1.6.0     2021-04-13 [2] CRAN (R 4.0.5)
+    ##  pkgbuild       1.2.0     2020-12-15 [2] CRAN (R 4.0.3)
+    ##  pkgconfig      2.0.3     2019-09-22 [2] CRAN (R 4.0.3)
+    ##  pkgload        1.2.1     2021-04-06 [2] CRAN (R 4.0.5)
+    ##  plyr           1.8.6     2020-03-03 [2] CRAN (R 4.0.3)
+    ##  png            0.1-7     2013-12-03 [2] CRAN (R 4.0.3)
+    ##  PopGenReport   3.0.4     2019-02-04 [2] CRAN (R 4.0.5)
+    ##  prettyunits    1.1.1     2020-01-24 [2] CRAN (R 4.0.3)
+    ##  processx       3.5.2     2021-04-30 [2] CRAN (R 4.0.5)
+    ##  progress       1.2.2     2019-05-16 [2] CRAN (R 4.0.3)
+    ##  promises       1.2.0.1   2021-02-11 [2] CRAN (R 4.0.5)
+    ##  proxy          0.4-25    2021-03-05 [2] CRAN (R 4.0.4)
+    ##  ps             1.5.0     2020-12-05 [2] CRAN (R 4.0.3)
+    ##  purrr          0.3.4     2020-04-17 [2] CRAN (R 4.0.3)
+    ##  R.methodsS3    1.8.1     2020-08-26 [2] CRAN (R 4.0.3)
+    ##  R.oo           1.24.0    2020-08-26 [2] CRAN (R 4.0.3)
+    ##  R.utils        2.10.1    2020-08-26 [2] CRAN (R 4.0.3)
+    ##  R6             2.5.0     2020-10-28 [2] CRAN (R 4.0.3)
+    ##  raster         3.4-5     2020-11-14 [2] CRAN (R 4.0.4)
+    ##  RColorBrewer * 1.1-2     2014-12-07 [2] CRAN (R 4.0.3)
+    ##  Rcpp           1.0.6     2021-01-15 [2] CRAN (R 4.0.3)
+    ##  remotes        2.3.0     2021-04-01 [2] CRAN (R 4.0.5)
+    ##  reshape        0.8.8     2018-10-23 [2] CRAN (R 4.0.3)
+    ##  reshape2       1.4.4     2020-04-09 [2] CRAN (R 4.0.3)
+    ##  rgdal          1.5-23    2021-02-03 [2] CRAN (R 4.0.5)
+    ##  RgoogleMaps    1.4.5.3   2020-02-12 [2] CRAN (R 4.0.5)
+    ##  rlang          0.4.10    2020-12-30 [2] CRAN (R 4.0.3)
+    ##  rmarkdown      2.8       2021-05-07 [2] CRAN (R 4.0.5)
+    ##  robustbase     0.93-8    2021-06-02 [2] CRAN (R 4.0.5)
+    ##  rprojroot      2.0.2     2020-11-15 [2] CRAN (R 4.0.3)
+    ##  scales         1.1.1     2020-05-11 [2] CRAN (R 4.0.3)
+    ##  seqinr         4.2-5     2020-12-17 [2] CRAN (R 4.0.4)
+    ##  sessioninfo    1.1.1     2018-11-05 [2] CRAN (R 4.0.3)
+    ##  sf             0.9-8     2021-03-17 [2] CRAN (R 4.0.4)
+    ##  shiny          1.6.0     2021-01-25 [2] CRAN (R 4.0.5)
+    ##  SNPRelate      1.24.0    2020-10-28 [2] Bioconductor  
+    ##  sp             1.4-5     2021-01-10 [2] CRAN (R 4.0.3)
+    ##  spData         0.3.8     2020-07-03 [2] CRAN (R 4.0.4)
+    ##  spdep          1.1-7     2021-04-03 [2] CRAN (R 4.0.5)
+    ##  StAMPP         1.6.2     2021-04-26 [2] CRAN (R 4.0.5)
+    ##  stringi        1.5.3     2020-09-09 [2] CRAN (R 4.0.3)
+    ##  stringr        1.4.0     2019-02-10 [2] CRAN (R 4.0.3)
+    ##  testthat       3.0.2     2021-02-14 [2] CRAN (R 4.0.5)
+    ##  tibble         3.0.5     2021-01-15 [2] CRAN (R 4.0.3)
+    ##  tidyr          1.1.2     2020-08-27 [2] CRAN (R 4.0.3)
+    ##  tidyselect     1.1.0     2020-05-11 [2] CRAN (R 4.0.3)
+    ##  units          0.7-1     2021-03-16 [2] CRAN (R 4.0.4)
+    ##  usethis        2.0.1     2021-02-10 [2] CRAN (R 4.0.5)
+    ##  utf8           1.2.1     2021-03-12 [2] CRAN (R 4.0.5)
+    ##  vctrs          0.3.6     2020-12-17 [2] CRAN (R 4.0.3)
+    ##  vegan          2.5-7     2020-11-28 [2] CRAN (R 4.0.3)
+    ##  withr          2.4.1     2021-01-26 [2] CRAN (R 4.0.5)
+    ##  xfun           0.23      2021-05-15 [2] CRAN (R 4.0.3)
+    ##  xtable         1.8-4     2019-04-21 [2] CRAN (R 4.0.3)
+    ##  yaml           2.2.1     2020-02-01 [2] CRAN (R 4.0.3)
+    ## 
+    ## [1] C:/Users/BWaweru/OneDrive - CGIAR/Documents/R/win-library/4.0
+    ## [2] C:/R/R-4.0.3/library
