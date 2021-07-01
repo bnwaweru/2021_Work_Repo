@@ -261,20 +261,13 @@ pop_all<-rbind(pop_all,get(paste("pop",num,sep="")))
 Our data is ready, now we can plot
 
 ``` r
-barplot(t(as.matrix(pop_all)),width=2,col=rainbow(C),xlab="", ylab="", border=NA,axes = FALSE, axisnames = TRUE,las=2,cex.names=0.6)
-```
+barplot(t(as.matrix(pop_all)),width=2,col=rainbow(C),xlab="", ylab="Population Probability", border=NA,axes = FALSE, axisnames = F,las=2,cex.names=0.6, main = "Structure like plot of Athumani Goat data at K value of 8")
 
-<div class="figure" style="text-align: center">
+barplot(t(as.matrix(pop_all)),col=rainbow(C),xlab="", ylab="", border=NA, axes = FALSE, axisnames = F)
 
-<img src="Popolation-Structure-with-Admixture-and-R_files/figure-gfm/structure-fig-1.png" alt="Structure like plot of Athumani Goat data at K value of 8" width="100%" />
-<p class="caption">
-Structure like plot of Athumani Goat data at K value of 8
-</p>
-
-</div>
-
-``` r
 #svg(filename = "results/K-8-structure-plot.svg", width = 15, height = 10)
 #barplot(t(as.matrix(pop_all)),width=2,col=rainbow(C),xlab="", ylab="", border=NA,axes = FALSE, axisnames = TRUE,las=2,cex.names=0.6)
 #dev.off()
 ```
+
+![Structure\_K8\_fig](results/Structure_plot_K8.svg)
