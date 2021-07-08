@@ -138,22 +138,13 @@ levels(CV_Values$K_value)
 
 CV_Values$K_value <- factor(CV_Values$K_value, levels = c("K=2","K=3","K=4","K=5","K=6","K=7","K=8","K=9","K=10"))
 
-plot(CV_Values$CV, type = "o")
+#plot(CV_Values$CV, type = "o")
 
 # in ggplot
 require(ggplot2)
 ```
 
     ## Loading required package: ggplot2
-
-<div class="figure" style="text-align: center">
-
-<img src="Popolation-Structure-with-Admixture-and-R_files/figure-gfm/cv-fig-1-1.png" alt="Graph of CV values!" width="100%" />
-<p class="caption">
-Graph of CV values!
-</p>
-
-</div>
 
 ``` r
 #par(mar = c(4, 4, .1, .1))
@@ -168,7 +159,7 @@ print(cv_plot)
 
 <div class="figure" style="text-align: center">
 
-<img src="Popolation-Structure-with-Admixture-and-R_files/figure-gfm/cv-fig-1-2.png" alt="Graph of CV values!" width="100%" />
+<img src="Popolation-Structure-with-Admixture-and-R_files/figure-gfm/cv-fig-1-1.png" alt="Graph of CV values!" width="100%" />
 <p class="caption">
 Graph of CV values!
 </p>
@@ -695,19 +686,7 @@ barplot(t(as.matrix(pop_all)),
         border=NA, axes = FALSE, axisnames = F,
         las=2,cex.names=0.6, 
         main = "Structure like plot of Athumani Goat data at K value of 9 with data filtered at LD=0.02")
-```
 
-<div class="figure" style="text-align: center">
-
-<img src="Popolation-Structure-with-Admixture-and-R_files/figure-gfm/structure-fig-2-1.png" alt="Structure like plot of Athumani Goat data at K value of 9 with data filtered at LD=0.02" width="100%" />
-<p class="caption">
-Structure like plot of Athumani Goat data at K value of 9 with data
-filtered at LD=0.02
-</p>
-
-</div>
-
-``` r
 #barplot(t(as.matrix(pop_all)),col=rainbow(C),xlab="", ylab="", border=NA, axes = FALSE, axisnames = F)
 
 #svg(filename = "results/K-8-structure-plot.svg", width = 15, height = 10)
