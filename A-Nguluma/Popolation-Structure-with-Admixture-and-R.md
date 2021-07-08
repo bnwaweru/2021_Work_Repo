@@ -100,15 +100,39 @@ R. This is for the first run where we tested K values from 2 to 10.
 ``` r
 read.table("data-raw/cv_values.txt", header = F) -> CV_Values
 str(CV_Values)
+```
+
+    ## 'data.frame':    9 obs. of  2 variables:
+    ##  $ V1: chr  "K=10" "K=2" "K=3" "K=4" ...
+    ##  $ V2: num  0.606 0.619 0.612 0.61 0.609 ...
+
+``` r
 colnames(CV_Values) <- c("K_value", "CV")
 CV_Values
+```
 
+    ##   K_value      CV
+    ## 1    K=10 0.60614
+    ## 2     K=2 0.61885
+    ## 3     K=3 0.61223
+    ## 4     K=4 0.61027
+    ## 5     K=5 0.60867
+    ## 6     K=6 0.60811
+    ## 7     K=7 0.60733
+    ## 8     K=8 0.60608
+    ## 9     K=9 0.60634
+
+``` r
 # reorder the K values correctly
 
 CV_Values$K_value <- as.factor(CV_Values$K_value)
 
 levels(CV_Values$K_value)
+```
 
+    ## [1] "K=10" "K=2"  "K=3"  "K=4"  "K=5"  "K=6"  "K=7"  "K=8"  "K=9"
+
+``` r
 #re-order based on acending values of the cv
 #CV_Values$K_value <- reorder(CV_Values$K_value, CV_Values$CV, order = T)
 
@@ -118,6 +142,20 @@ plot(CV_Values$CV, type = "o")
 
 # in ggplot
 require(ggplot2)
+```
+
+    ## Loading required package: ggplot2
+
+<div class="figure" style="text-align: center">
+
+<img src="Popolation-Structure-with-Admixture-and-R_files/figure-gfm/cv-fig-1-1.png" alt="Graph of CV values!" width="100%" />
+<p class="caption">
+Graph of CV values!
+</p>
+
+</div>
+
+``` r
 #par(mar = c(4, 4, .1, .1))
 
 cv_plot <- 
@@ -125,8 +163,17 @@ cv_plot <-
   geom_point(aes(size = CV), colour = "blue")+
   xlab("Value of K") + ylab("CV error") 
 
-cv_plot
+print(cv_plot)
 ```
+
+<div class="figure" style="text-align: center">
+
+<img src="Popolation-Structure-with-Admixture-and-R_files/figure-gfm/cv-fig-1-2.png" alt="Graph of CV values!" width="100%" />
+<p class="caption">
+Graph of CV values!
+</p>
+
+</div>
 
 From the above plot we see that the least CV error is when we have a
 possible 8 underlying populations, and closely followed by 10
@@ -223,8 +270,9 @@ barplot(t(as.matrix(pop_all)),col=rainbow(C),xlab="", ylab="", border=NA, axes =
 #dev.off()
 ```
 
-![Structure\_K8\_fig](results/Structure_plot_K8.svg) We re-run the
-admixture, testing K values from 1 to 10. Let’s plot this.
+![Structure\_K8\_fig](results/Structure_plot_K8.svg)
+
+We re-run the admixture, testing K values from 1 to 10. Let’s plot this.
 
 ``` r
 read.table("data-raw/CV_values_1-10_July_2.txt", header = F) -> CV_Values
@@ -275,11 +323,7 @@ levels(CV_Values$cluster)
 
 # in ggplot
 require(ggplot2)
-```
 
-    ## Loading required package: ggplot2
-
-``` r
 cv_plot <- 
   ggplot(CV_Values, aes(x=cluster, y=CV)) + 
   geom_point(aes(size = CV), colour = "blue")+
@@ -651,8 +695,20 @@ barplot(t(as.matrix(pop_all)),
         border=NA, axes = FALSE, axisnames = F,
         las=2,cex.names=0.6, 
         main = "Structure like plot of Athumani Goat data at K value of 9 with data filtered at LD=0.02")
+```
 
-barplot(t(as.matrix(pop_all)),col=rainbow(C),xlab="", ylab="", border=NA, axes = FALSE, axisnames = F)
+<div class="figure" style="text-align: center">
+
+<img src="Popolation-Structure-with-Admixture-and-R_files/figure-gfm/structure-fig-2-1.png" alt="Structure like plot of Athumani Goat data at K value of 9 with data filtered at LD=0.02" width="100%" />
+<p class="caption">
+Structure like plot of Athumani Goat data at K value of 9 with data
+filtered at LD=0.02
+</p>
+
+</div>
+
+``` r
+#barplot(t(as.matrix(pop_all)),col=rainbow(C),xlab="", ylab="", border=NA, axes = FALSE, axisnames = F)
 
 #svg(filename = "results/K-8-structure-plot.svg", width = 15, height = 10)
 #barplot(t(as.matrix(pop_all)),width=2,col=rainbow(C),xlab="", ylab="", border=NA,axes = FALSE, axisnames = TRUE,las=2,cex.names=0.6)
